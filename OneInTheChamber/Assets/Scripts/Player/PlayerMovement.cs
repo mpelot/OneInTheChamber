@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public SpriteRenderer sprender;
     public float acceleration;
     public float maxSpeed = 4;
-    public float jumpForce = 10;
+    public float jumpForce = 20;
     public float coyoteTimeLength = .25f;
     public float inputBufferLength = .25f;
     public float jumpCooldownLength = .4f;
@@ -16,17 +16,22 @@ public class PlayerMovement : MonoBehaviour
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
+    private float accelValue;
+    private bool inAir = true;
+    private bool holdingSpace = false;
 
     // Start is called before the first frame update
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
+        accelValue = acceleration;
     }
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
+            holdingSpace = true;
             if(coyoteTimer > 0)
             {
                 Jump();
@@ -36,13 +41,25 @@ public class PlayerMovement : MonoBehaviour
                 inputBufferTimer = inputBufferLength;
             }
         }
+        if(inAir)
+        {
+            accelValue = .7f *acceleration;
+        }
+        else
+        {
+            accelValue = acceleration;
+        }
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            holdingSpace = false;
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         Vector2 goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * maxSpeed, rbody.velocity.y);
-        rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, acceleration * Time.fixedDeltaTime);
+        rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
         if(coyoteTimer > 0)
         {
             coyoteTimer -= Time.fixedDeltaTime;
@@ -54,6 +71,10 @@ public class PlayerMovement : MonoBehaviour
         if(jumpCooldownTimer > 0)
         {
             jumpCooldownTimer -= Time.fixedDeltaTime;
+        }
+        if(holdingSpace == false || rbody.velocity.y < 0)
+        {
+            rbody.gravityScale = rbody.gravityScale + 4.5f * Time.fixedDeltaTime;
         }
     }
 
@@ -67,7 +88,19 @@ public class PlayerMovement : MonoBehaviour
         {
             coyoteTimer = coyoteTimeLength;
         }
+        rbody.gravityScale = 1.5f;
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        inAir = false;
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        inAir = true;
+    }
+
     private void Jump()
     {
         rbody.velocity = new Vector2(rbody.velocity.x, jumpForce);

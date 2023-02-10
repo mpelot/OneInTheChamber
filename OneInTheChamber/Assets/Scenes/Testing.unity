@@ -352,9 +352,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rbody: {fileID: 0}
   sprender: {fileID: 0}
-  acceleration: 12
-  maxSpeed: 4
-  jumpForce: 5
+  acceleration: 13
+  maxSpeed: 5
+  jumpForce: 9
   coyoteTimeLength: 0.15
   inputBufferLength: 0.2
   jumpCooldownLength: 0.4
@@ -440,7 +440,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 1.5
   m_Material: {fileID: 6200000, guid: 7c28b4b9f2fe73840bbdcaf7abf10b36, type: 2}
   m_Interpolate: 1
   m_SleepingMode: 0
