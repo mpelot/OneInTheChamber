@@ -78,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if(inputBufferTimer > 0)
         {
@@ -91,12 +91,12 @@ public class PlayerMovement : MonoBehaviour
         rbody.gravityScale = 1.5f;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         inAir = false;
     }
 
-    private void OnCollisionExit2D(Collision2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
         inAir = true;
     }
