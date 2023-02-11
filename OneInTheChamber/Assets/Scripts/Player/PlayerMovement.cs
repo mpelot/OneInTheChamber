@@ -83,9 +83,13 @@ public class PlayerMovement : MonoBehaviour
             jumpCooldownTimer -= Time.fixedDeltaTime;
         }
         //Increases Gravity Scale During Jump
-        if(holdingSpace == false || rbody.velocity.y < 0)
+        if((holdingSpace == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= 4)
         {
-            rbody.gravityScale = rbody.gravityScale + 4.5f * Time.fixedDeltaTime;
+            rbody.gravityScale = rbody.gravityScale + 16.5f * Time.fixedDeltaTime;
+        }
+        else if(holdingSpace == true && rbody.velocity.y >= 0)
+        {
+            rbody.gravityScale = 1.75f;
         }
     }
 
@@ -102,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimer = coyoteTimeLength;
         }
         //Sets Gravity Back To Normal
-        rbody.gravityScale = 1.5f;
+        rbody.gravityScale = 2f;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 4.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -354,8 +354,8 @@ MonoBehaviour:
   rbody: {fileID: 0}
   sprender: {fileID: 0}
   acceleration: 13
-  maxSpeed: 5
-  jumpForce: 9
+  maxSpeed: 4
+  jumpForce: 7
   coyoteTimeLength: 0.15
   inputBufferLength: 0.2
   jumpCooldownLength: 0.4
@@ -419,8 +419,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1382153652}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.09, y: -1.3378236, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0, y: -2.01, z: 0}
+  m_LocalScale: {x: 0.66666, y: 0.83333, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -445,7 +445,7 @@ Rigidbody2D:
   m_Material: {fileID: 6200000, guid: 7c28b4b9f2fe73840bbdcaf7abf10b36, type: 2}
   m_Interpolate: 1
   m_SleepingMode: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &1382153657
 BoxCollider2D:
@@ -497,5 +497,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.9, y: 0.05}
+  m_Size: {x: 0.95, y: 0.05}
   m_EdgeRadius: 0
