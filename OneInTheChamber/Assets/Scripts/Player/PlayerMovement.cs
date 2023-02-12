@@ -18,7 +18,9 @@ public class PlayerMovement : MonoBehaviour
     private float jumpCooldownTimer = 0;
     private float accelValue;
     private bool inAir = true;
-    private bool holdingSpace = false;
+    private Vector2 goalSpeed;
+    private bool longJump = false;
+    private float fastFallModifier;
 
     // Start is called before the first frame update
     void Start()
@@ -30,10 +32,8 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         //If Jump Pressed
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKey(KeyCode.Space))
         {
-            //Start Long Jump
-            holdingSpace = true;
 
             //Coyote Time
             if(coyoteTimer > 0)
@@ -51,6 +51,10 @@ public class PlayerMovement : MonoBehaviour
             //Decreases Air Horizontal Movement
             accelValue = .7f *acceleration;
         }
+        else if (!inAir && (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x)))
+        {
+            accelValue = 1.75f * acceleration;
+        }
         else
         {
             accelValue = acceleration;
@@ -58,7 +62,12 @@ public class PlayerMovement : MonoBehaviour
         if(Input.GetKeyUp(KeyCode.Space))
         {
             //End Long Jump
-            holdingSpace = false;
+            longJump = false;
+        }
+        if(inAir && Input.GetKey(KeyCode.S))
+        {
+            longJump = false;
+            fastFallModifier = 1.2f;
         }
     }
 
@@ -66,7 +75,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         //Horizontal Speed
-        Vector2 goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * maxSpeed, rbody.velocity.y);
+        goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * maxSpeed, rbody.velocity.y);
         rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
         
         //Decreases Coyote Time Timer, Input Buffer Timer, and Jump Cooldown Timer
@@ -83,11 +92,11 @@ public class PlayerMovement : MonoBehaviour
             jumpCooldownTimer -= Time.fixedDeltaTime;
         }
         //Increases Gravity Scale During Jump
-        if((holdingSpace == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= 4)
+        if((longJump == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= 4)
         {
-            rbody.gravityScale = rbody.gravityScale + 16.5f * Time.fixedDeltaTime;
+            rbody.gravityScale = rbody.gravityScale + 16.5f * fastFallModifier * Time.fixedDeltaTime;
         }
-        else if(holdingSpace == true && rbody.velocity.y >= 0)
+        else if(longJump == true && rbody.velocity.y >= 0)
         {
             rbody.gravityScale = 1.75f;
         }
@@ -124,5 +133,7 @@ public class PlayerMovement : MonoBehaviour
         rbody.velocity = new Vector2(rbody.velocity.x, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
+        longJump = true;
+        fastFallModifier = 1;
     }
 }
