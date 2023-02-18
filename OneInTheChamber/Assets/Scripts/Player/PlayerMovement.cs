@@ -7,16 +7,19 @@ public class PlayerMovement : MonoBehaviour
     public Rigidbody2D rbody;
     public SpriteRenderer sprender;
     public float acceleration;
-    public float maxSpeed = 4;
+    public float maxRunSpeed = 4;
+    public float trueMaxSpeed = 20;
     public float jumpForce = 20;
     public float coyoteTimeLength = .25f;
     public float inputBufferLength = .25f;
     public float jumpCooldownLength = .4f;
 	public GameObject bulletPrefab;
+    public float bulletForce;
 
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
+    private float currentMaxSpeed;
     private float accelValue;
     private bool inAir = true;
     private Vector2 goalSpeed;
@@ -51,15 +54,17 @@ public class PlayerMovement : MonoBehaviour
         }
         if(inAir)
         {
-            //Decreases Air Horizontal Movement
+            //Decreases Air Horizontal Movement Control
             accelValue = .7f *acceleration;
         }
-        else if (!inAir && (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x)))
+        else if (!Input.GetKey(KeyCode.Space) && !inAir && (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x)))
         {
+            //If decelerating, make accel value faster
             accelValue = 1.75f * acceleration;
         }
         else
         {
+            //If accelerating, make accel value determined acceleration rate
             accelValue = acceleration;
         }
 		
@@ -85,24 +90,31 @@ public class PlayerMovement : MonoBehaviour
 			Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
 			// Revert z transform
 			norm.z = 0;
-			
-			// Find angle between myself and the spawned bullet
-			float angle = Mathf.Atan2(norm.y - transform.position.y, norm.x - transform.position.x);
-			Vector3 npos = new Vector3(transform.position.x + Mathf.Cos(angle) * 0.4f, transform.position.y + Mathf.Sin(angle) * 0.4f, 0);
-			
-			// TODO: add recoil to the player
-			
+
+            Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
 			GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-			newBullet.GetComponent<BulletPhysics>().movAngle = angle;
-			
+			newBullet.GetComponent<BulletPhysics>().movAngle = bulletDirection;
+            
+            //Add Recoil
+            rbody.velocity += -bulletDirection * bulletForce;
 		}
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        //B-Hopping
+        if(inAir && Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
+        {
+            currentMaxSpeed = Mathf.Abs(rbody.velocity.x);
+        }
+        else
+        {
+            currentMaxSpeed = maxRunSpeed;
+        }
+
         //Horizontal Speed
-        goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * maxSpeed, rbody.velocity.y);
+        goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
         rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
         
         //Decreases Coyote Time Timer, Input Buffer Timer, and Jump Cooldown Timer
