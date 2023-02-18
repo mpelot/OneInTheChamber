@@ -470,6 +470,7 @@ MonoBehaviour:
   coyoteTimeLength: 0.15
   inputBufferLength: 0.1
   jumpCooldownLength: 0.4
+  bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
 --- !u!212 &1382153654
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -530,8 +531,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1382153652}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: -2.01, z: 0}
-  m_LocalScale: {x: 0.66666, y: 0.83333, z: 1}
+  m_LocalPosition: {x: -0, y: -2.0151, z: 0}
+  m_LocalScale: {x: 0.66666, y: 0.82308, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

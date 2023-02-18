@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public float coyoteTimeLength = .25f;
     public float inputBufferLength = .25f;
     public float jumpCooldownLength = .4f;
+	public GameObject bulletPrefab;
 
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
@@ -21,12 +22,14 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 goalSpeed;
     private bool longJump = false;
     private float fastFallModifier;
+    private Camera mainCam;
 
     // Start is called before the first frame update
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
         accelValue = acceleration;
+		mainCam = Camera.main;
     }
 
     private void Update()
@@ -59,16 +62,40 @@ public class PlayerMovement : MonoBehaviour
         {
             accelValue = acceleration;
         }
+		
         if(Input.GetKeyUp(KeyCode.Space))
         {
             //End Long Jump
             longJump = false;
         }
+		
         if(inAir && Input.GetKey(KeyCode.S))
         {
             longJump = false;
             fastFallModifier = 1.2f;
         }
+		
+		if (Input.GetMouseButtonDown(0)) {
+			// NOTE: mouse position is in screenspace!
+			// We must normalize into worldspace before we can use these coords.
+			Vector3 mousePos = Input.mousePosition;
+			// z needs to be nonzero for this to work
+			mousePos.z = mainCam.nearClipPlane;
+			
+			Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
+			// Revert z transform
+			norm.z = 0;
+			
+			// Find angle between myself and the spawned bullet
+			float angle = Mathf.Atan2(norm.y - transform.position.y, norm.x - transform.position.x);
+			Vector3 npos = new Vector3(transform.position.x + Mathf.Cos(angle) * 0.4f, transform.position.y + Mathf.Sin(angle) * 0.4f, 0);
+			
+			// TODO: add recoil to the player
+			
+			GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+			newBullet.GetComponent<BulletPhysics>().movAngle = angle;
+			
+		}
     }
 
     // Update is called once per frame
