@@ -4,21 +4,32 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody2D rbody;
-    public SpriteRenderer sprender;
+    //Movement
     public float acceleration;
-    public float maxRunSpeed = 4;
-    public float trueMaxSpeed = 20;
-    public float jumpForce = 20;
-    public float coyoteTimeLength = .25f;
-    public float inputBufferLength = .25f;
-    public float jumpCooldownLength = .4f;
+    public float maxRunSpeed;
+    public float trueMaxSpeed;
+
+    //Jumping
+    public float jumpForce;
+    public float coyoteTimeLength;
+    public float inputBufferLength;
+    public float jumpCooldownLength;
+    public float defaultGravity;
+    public float longJumpGravity;
+    public float fallingAccelRate;
+    public float maxGravity;
+    public float wallHangTime;
+    public float wallGravity;
+
+    //Shooting
 	public GameObject bulletPrefab;
     public float bulletForce;
 
+    private Rigidbody2D rbody;
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
+    private float wallTimer = 0;
     private float currentMaxSpeed;
     private float accelValue;
     private bool inAir = true;
@@ -26,13 +37,15 @@ public class PlayerMovement : MonoBehaviour
     private bool longJump = false;
     private float fastFallModifier;
     private Camera mainCam;
+    private LayerMask wall;
+    private float lastSpeed;
 
-    // Start is called before the first frame update
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
         accelValue = acceleration;
 		mainCam = Camera.main;
+        wall = LayerMask.GetMask("Walls");
     }
 
     private void Update()
@@ -52,6 +65,26 @@ public class PlayerMovement : MonoBehaviour
                 inputBufferTimer = inputBufferLength;
             }
         }
+
+        //Right Wall Cling
+        /*if (Input.GetAxisRaw("Horizontal") > 0)
+        {
+            RaycastHit2D right = Physics2D.Raycast((Vector2)transform.position, Vector2.right*.42f, .42f, wall);
+            if(right.collider != null && right.collider.tag == "Floor" && inAir)
+            {
+                if(wallTimer <= 0)
+                {
+                    rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * .5f);
+                }
+                wallTimer = wallHangTime;
+            }
+        }
+        if(wallTimer > 0)
+        {
+            rbody.gravityScale = wallGravity;
+        }*/
+
+        //Air and Ground Acceleration
         if(inAir)
         {
             //Decreases Air Horizontal Movement Control
@@ -59,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (!Input.GetKey(KeyCode.Space) && !inAir && (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x)))
         {
-            //If decelerating, make accel value faster
+            //If decelerating on the ground, make accel value faster
             accelValue = 1.75f * acceleration;
         }
         else
@@ -68,12 +101,14 @@ public class PlayerMovement : MonoBehaviour
             accelValue = acceleration;
         }
 		
+        //Early Long Jump End
         if(Input.GetKeyUp(KeyCode.Space))
         {
             //End Long Jump
             longJump = false;
         }
 		
+        //Fast Falling
         if(inAir && Input.GetKey(KeyCode.S))
         {
             longJump = false;
@@ -98,12 +133,14 @@ public class PlayerMovement : MonoBehaviour
             //Add Recoil
             rbody.velocity += -bulletDirection * bulletForce;
 		}
+
+        //Keep Current Speed For Next Frame
+        lastSpeed = rbody.velocity.x;
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-        //B-Hopping
+        //If B-Hopping, Change Max Speed settings to keep current momentum
         if(inAir && Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
         {
             currentMaxSpeed = Mathf.Abs(rbody.velocity.x);
@@ -117,7 +154,7 @@ public class PlayerMovement : MonoBehaviour
         goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
         rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
         
-        //Decreases Coyote Time Timer, Input Buffer Timer, and Jump Cooldown Timer
+        //Decrements Coyote Time Timer, Input Buffer Timer, and Jump Cooldown Timer
         if(coyoteTimer > 0)
         {
             coyoteTimer -= Time.fixedDeltaTime;
@@ -130,14 +167,21 @@ public class PlayerMovement : MonoBehaviour
         {
             jumpCooldownTimer -= Time.fixedDeltaTime;
         }
-        //Increases Gravity Scale During Jump
-        if((longJump == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= 4)
+        if(wallTimer > 0)
         {
-            rbody.gravityScale = rbody.gravityScale + 16.5f * fastFallModifier * Time.fixedDeltaTime;
+            wallTimer -= Time.fixedDeltaTime;
+        }
+
+        //Increases Gravity Scale During Jump
+        if((longJump == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= maxGravity)
+        {
+            //If Short Jump or Ended Long Jump
+            rbody.gravityScale = rbody.gravityScale + fallingAccelRate * fastFallModifier * Time.fixedDeltaTime;
         }
         else if(longJump == true && rbody.velocity.y >= 0)
         {
-            rbody.gravityScale = 1.75f;
+            //If Long Jumping
+            rbody.gravityScale = longJumpGravity;
         }
     }
 
@@ -153,13 +197,18 @@ public class PlayerMovement : MonoBehaviour
         {
             coyoteTimer = coyoteTimeLength;
         }
+        
         //Sets Gravity Back To Normal
-        rbody.gravityScale = 2f;
+        rbody.gravityScale = defaultGravity;
+
+        //Sets In-Air to false
+        inAir = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         inAir = false;
+        wallTimer = 0;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -169,6 +218,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
+        Debug.Log(transform.position.y);
         rbody.velocity = new Vector2(rbody.velocity.x, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
