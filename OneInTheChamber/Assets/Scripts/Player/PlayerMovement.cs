@@ -134,6 +134,11 @@ public class PlayerMovement : MonoBehaviour
             //Add Recoil
             rbody.velocity += -bulletDirection * bulletForce;
             longJump = false;
+            if(bulletDirection.y > 0)
+            {
+                coyoteTimer = 0;
+                jumpCooldownTimer = coyoteTimeLength;
+            }
 		}
 
         //Keep Current Speed For Next Frame
