@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpCooldownLength;
     public float defaultGravity;
     public float longJumpGravity;
-    public float fallingAccelRate;
+    public float fallingAccel;
     public float maxGravity;
     public float wallHangTime;
     public float wallGravity;
@@ -46,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
         accelValue = acceleration;
 		mainCam = Camera.main;
         wall = LayerMask.GetMask("Walls");
+        fastFallModifier = 1;
     }
 
     private void Update()
@@ -132,6 +133,7 @@ public class PlayerMovement : MonoBehaviour
             
             //Add Recoil
             rbody.velocity += -bulletDirection * bulletForce;
+            longJump = false;
 		}
 
         //Keep Current Speed For Next Frame
@@ -176,7 +178,7 @@ public class PlayerMovement : MonoBehaviour
         if((longJump == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= maxGravity)
         {
             //If Short Jump or Ended Long Jump
-            rbody.gravityScale = rbody.gravityScale + fallingAccelRate * fastFallModifier * Time.fixedDeltaTime;
+            rbody.gravityScale = fallingAccel * fastFallModifier;
         }
         else if(longJump == true && rbody.velocity.y >= 0)
         {
@@ -222,7 +224,15 @@ public class PlayerMovement : MonoBehaviour
         rbody.velocity = new Vector2(rbody.velocity.x, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
-        longJump = true;
+        //Long Jump Must Have Space Held Down (In case using Input Buffering)
+        if(Input.GetKey(KeyCode.Space))
+        {
+            longJump = true;
+        }
+        else
+        {
+            longJump = false;
+        }
         fastFallModifier = 1;
     }
 }
