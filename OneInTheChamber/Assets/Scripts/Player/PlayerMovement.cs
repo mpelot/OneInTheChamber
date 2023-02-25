@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     public float acceleration;
     public float maxRunSpeed;
     public float trueMaxSpeed;
+    public enum State {inAir, onGround, wallCling};
+    public State playerState;
 
     //Jumping
     public float jumpForce;
@@ -32,7 +34,6 @@ public class PlayerMovement : MonoBehaviour
     private float wallTimer = 0;
     private float currentMaxSpeed;
     private float accelValue;
-    private bool inAir = true;
     private Vector2 goalSpeed;
     private bool longJump = false;
     private float fastFallModifier;
@@ -47,75 +48,58 @@ public class PlayerMovement : MonoBehaviour
 		mainCam = Camera.main;
         wall = LayerMask.GetMask("Walls");
         fastFallModifier = 1;
+        playerState = State.inAir;
     }
 
     private void Update()
     {
-        //If Jump Pressed
-        if(Input.GetKey(KeyCode.Space))
+        //Player States
+        //IN AIR
+        if (playerState == State.inAir)
         {
+            //Restrict Horizontal Movement In Air
+            accelValue = .7f * acceleration;
 
-            //Coyote Time
-            if(coyoteTimer > 0)
+            //If Jumping
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                //If Coyote Timer Active, Jump
+                if (coyoteTimer > 0)
+                {
+                    Jump();
+                }
+                else
+                {
+                    //Sets Input Buffer Timer
+                    inputBufferTimer = inputBufferLength;
+                }
+            }
+
+            //Enable Fast Falling
+            if (Input.GetKey(KeyCode.S))
+            {
+                fastFallModifier = 1.2f;
+                longJump = false;
+            }
+
+            //Disable Long Jump
+            if (Input.GetKeyUp(KeyCode.Space) || rbody.velocity.y <= 0)
+            {
+                longJump = false;
+            }
+        }
+
+        //ON GROUND
+        else if (playerState == State.onGround)
+        {
+            //Jump
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 Jump();
             }
-            else
-            {
-                //Sets Input Buffer Timer
-                inputBufferTimer = inputBufferLength;
-            }
-        }
-
-        //Right Wall Cling
-        /*if (Input.GetAxisRaw("Horizontal") > 0)
-        {
-            RaycastHit2D right = Physics2D.Raycast((Vector2)transform.position, Vector2.right*.42f, .42f, wall);
-            if(right.collider != null && right.collider.tag == "Floor" && inAir)
-            {
-                if(wallTimer <= 0)
-                {
-                    rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * .5f);
-                }
-                wallTimer = wallHangTime;
-            }
-        }
-        if(wallTimer > 0)
-        {
-            rbody.gravityScale = wallGravity;
-        }*/
-
-        //Air and Ground Acceleration
-        if(inAir)
-        {
-            //Decreases Air Horizontal Movement Control
-            accelValue = .7f *acceleration;
-        }
-        else if (!Input.GetKey(KeyCode.Space) && !inAir && (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x)))
-        {
-            //If decelerating on the ground, make accel value faster
-            accelValue = 1.75f * acceleration;
-        }
-        else
-        {
-            //If accelerating, make accel value determined acceleration rate
-            accelValue = acceleration;
         }
 		
-        //Early Long Jump End
-        if(Input.GetKeyUp(KeyCode.Space))
-        {
-            //End Long Jump
-            longJump = false;
-        }
-		
-        //Fast Falling
-        if(inAir && Input.GetKey(KeyCode.S))
-        {
-            longJump = false;
-            fastFallModifier = 1.2f;
-        }
-		
+		//Shooting
 		if (Input.GetMouseButtonDown(0)) {
 			// NOTE: mouse position is in screenspace!
 			// We must normalize into worldspace before we can use these coords.
@@ -147,14 +131,46 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        //If B-Hopping, Change Max Speed settings to keep current momentum
-        if(inAir && Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
+        //Player States
+        //IN AIR
+        if (playerState == State.inAir)
         {
-            currentMaxSpeed = Mathf.Abs(rbody.velocity.x);
+            //If B-Hopping, Change Max Speed settings to keep current momentum
+            if (Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
+            {
+                currentMaxSpeed = Mathf.Abs(rbody.velocity.x);
+            }
+            else
+            {
+                currentMaxSpeed = maxRunSpeed;
+            }
+            
+            //Variable Jump Height
+            if (longJump == false && rbody.gravityScale <= maxGravity)
+            {
+                //If Short Jump or Ended Long Jump
+                rbody.gravityScale = fallingAccel * fastFallModifier;
+            }
+            else if (longJump == true && rbody.velocity.y >= 0)
+            {
+                //If Long Jumping
+                rbody.gravityScale = longJumpGravity;
+            }
         }
-        else
+
+        //ON GROUND
+        else if (playerState == State.onGround)
         {
-            currentMaxSpeed = maxRunSpeed;
+            //If Decelerating
+            if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
+            {
+                accelValue = 1.75f * acceleration;
+            }
+            //If Accelerating
+            else
+            {
+                accelValue = acceleration;
+            }
         }
 
         //Horizontal Speed
@@ -179,17 +195,6 @@ public class PlayerMovement : MonoBehaviour
             wallTimer -= Time.fixedDeltaTime;
         }
 
-        //Increases Gravity Scale During Jump
-        if((longJump == false || rbody.velocity.y < 0 ) && rbody.gravityScale <= maxGravity)
-        {
-            //If Short Jump or Ended Long Jump
-            rbody.gravityScale = fallingAccel * fastFallModifier;
-        }
-        else if(longJump == true && rbody.velocity.y >= 0)
-        {
-            //If Long Jumping
-            rbody.gravityScale = longJumpGravity;
-        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -199,33 +204,32 @@ public class PlayerMovement : MonoBehaviour
         {
             Jump();
         }
-        //Starts Coyote Time Timer
-        if(jumpCooldownTimer <= 0)
-        {
-            coyoteTimer = coyoteTimeLength;
-        }
         
         //Sets Gravity Back To Normal
         rbody.gravityScale = defaultGravity;
 
         //Sets In-Air to false
-        inAir = false;
+        playerState = State.onGround;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        inAir = false;
-        wallTimer = 0;
+        playerState = State.onGround;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        inAir = true;
+        playerState = State.inAir;
+
+        //Starts Coyote Time Timer
+        if (jumpCooldownTimer <= 0)
+        {
+            coyoteTimer = coyoteTimeLength;
+        }
     }
 
     private void Jump()
     {
-        Debug.Log(transform.position.y);
         rbody.velocity = new Vector2(rbody.velocity.x, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
