@@ -28,6 +28,8 @@ public class PlayerMovement : MonoBehaviour
     public float bulletForce;
 
     private Rigidbody2D rbody;
+    private Animator animator;
+    private bool facingRight = true;
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
@@ -44,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         accelValue = acceleration;
 		mainCam = Camera.main;
         wall = LayerMask.GetMask("Walls");
@@ -53,6 +56,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        //Update the speed parameter in the animator
+        animator.SetFloat("Speed", Mathf.Abs(rbody.velocity.x));
+
+        //If Turning
+        if ((rbody.velocity.x < 0 && facingRight) || rbody.velocity.x > 0 && !facingRight) 
+        {
+            // Flip the player
+            facingRight = !facingRight;
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
+        }
+
         //Player States
         //IN AIR
         if (playerState == State.inAir)
