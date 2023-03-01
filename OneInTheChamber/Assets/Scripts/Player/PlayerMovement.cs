@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         //Update the speed parameter in the animator
-        animator.SetFloat("Speed", Mathf.Abs(rbody.velocity.x));
+        animator.SetFloat("Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1, 0, 5));
 
         //If Turning
         if ((rbody.velocity.x < 0 && facingRight) || rbody.velocity.x > 0 && !facingRight) 
@@ -187,6 +187,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 accelValue = acceleration;
             }
+            currentMaxSpeed = maxRunSpeed;
         }
 
         //Horizontal Speed
