@@ -121,7 +121,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 24
+        y: 0
         width: 24
         height: 24
       alignment: 0
@@ -142,7 +142,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 24
-        y: 24
+        y: 0
         width: 24
         height: 24
       alignment: 0
@@ -163,7 +163,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 24
+        y: 0
         width: 24
         height: 24
       alignment: 0
@@ -183,7 +183,7 @@ TextureImporter:
       name: PlayerIdle_3
       rect:
         serializedVersion: 2
-        x: 0
+        x: 72
         y: 0
         width: 24
         height: 24
@@ -204,7 +204,7 @@ TextureImporter:
       name: PlayerIdle_4
       rect:
         serializedVersion: 2
-        x: 24
+        x: 96
         y: 0
         width: 24
         height: 24
@@ -225,7 +225,7 @@ TextureImporter:
       name: PlayerIdle_5
       rect:
         serializedVersion: 2
-        x: 48
+        x: 120
         y: 0
         width: 24
         height: 24
