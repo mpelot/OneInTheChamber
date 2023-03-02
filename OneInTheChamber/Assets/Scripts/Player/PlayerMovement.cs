@@ -57,7 +57,10 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         //Update the speed parameter in the animator
-        animator.SetFloat("Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1, 0, 5));
+        animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1, -1, 5));
+
+        //Update the vertical velocity parameter in the animator
+        animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y, -5, 5));
 
         //If Turning
         if ((rbody.velocity.x < 0 && facingRight) || rbody.velocity.x > 0 && !facingRight) 
@@ -232,11 +235,17 @@ public class PlayerMovement : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         playerState = State.onGround;
+        
+        //Update the grounded parameter in the animator
+        animator.SetBool("Grounded", true);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         playerState = State.inAir;
+
+        //Update the grounded parameter in the animator
+        animator.SetBool("Grounded", false);
 
         //Starts Coyote Time Timer
         if (jumpCooldownTimer <= 0)
