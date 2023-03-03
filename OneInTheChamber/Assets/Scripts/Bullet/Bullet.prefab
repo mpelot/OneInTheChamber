@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movAngle: {x: 0, y: 0}
-  bulletSpeed: 15
+  bulletSpeed: 20
 --- !u!50 &-4931415327569981390
 Rigidbody2D:
   serializedVersion: 4

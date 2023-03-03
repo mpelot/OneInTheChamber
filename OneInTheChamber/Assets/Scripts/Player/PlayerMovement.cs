@@ -26,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
     //Shooting
 	public GameObject bulletPrefab;
     public float bulletForce;
+    public float bulletTimeLength;
+    public float bulletTimeSlowdownFactor;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -34,11 +36,13 @@ public class PlayerMovement : MonoBehaviour
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
     private float wallTimer = 0;
+    private float bulletTimeTimer = 0;
     private float currentMaxSpeed;
     private float accelValue;
     private Vector2 goalSpeed;
     private bool longJump = false;
     private float fastFallModifier;
+    private bool shooting = false;
     private Camera mainCam;
     private LayerMask wall;
     private float lastSpeed;
@@ -119,30 +123,50 @@ public class PlayerMovement : MonoBehaviour
         }
 		
 		//Shooting
-		if (Input.GetMouseButtonDown(0)) {
-			// NOTE: mouse position is in screenspace!
-			// We must normalize into worldspace before we can use these coords.
-			Vector3 mousePos = Input.mousePosition;
-			// z needs to be nonzero for this to work
-			mousePos.z = mainCam.nearClipPlane;
-			
-			Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
-			// Revert z transform
-			norm.z = 0;
+		if (Input.GetMouseButtonDown(0)) 
+        {
+            shooting = true;
+            //Start bullet time timer
+            bulletTimeTimer = bulletTimeLength;
+            //Set time scale to the slowdown factor
+            Time.timeScale = bulletTimeSlowdownFactor;
+            Time.fixedDeltaTime = Time.timeScale * .02f;
+		}
+
+        //If left click is released or the timer expires:
+        if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0) 
+        {
+            //Fire
+            //Reset bullet time parameters
+            shooting = false;
+            bulletTimeTimer = 0;
+            //Reset the time scale
+            Time.timeScale = 1;
+            Time.fixedDeltaTime = .02f;
+
+            // NOTE: mouse position is in screenspace!
+            // We must normalize into worldspace before we can use these coords.
+            Vector3 mousePos = Input.mousePosition;
+            // z needs to be nonzero for this to work
+            mousePos.z = mainCam.nearClipPlane;
+
+            Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
+            // Revert z transform
+            norm.z = 0;
 
             Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
-			GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-			newBullet.GetComponent<BulletPhysics>().movAngle = bulletDirection;
-            
+            GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            newBullet.GetComponent<BulletPhysics>().movAngle = bulletDirection;
+
             //Add Recoil
             rbody.velocity += -bulletDirection * bulletForce;
             longJump = false;
-            if(bulletDirection.y > 0)
+            if(bulletDirection.y > 0) 
             {
                 coyoteTimer = 0;
                 jumpCooldownTimer = coyoteTimeLength;
             }
-		}
+        }
 
         //Keep Current Speed For Next Frame
         lastSpeed = rbody.velocity.x;
@@ -197,7 +221,7 @@ public class PlayerMovement : MonoBehaviour
         goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
         rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
         
-        //Decrements Coyote Time Timer, Input Buffer Timer, and Jump Cooldown Timer
+        //Decrements Coyote Time Timer, Input Buffer Timer, Jump Cooldown Timer, and Bullet Time Timer
         if(coyoteTimer > 0)
         {
             coyoteTimer -= Time.fixedDeltaTime;
@@ -214,7 +238,11 @@ public class PlayerMovement : MonoBehaviour
         {
             wallTimer -= Time.fixedDeltaTime;
         }
-
+        if (bulletTimeTimer > 0) 
+        {
+            //Time has to be unscaled here or it will be affected by the slowdown
+            bulletTimeTimer -= Time.fixedUnscaledDeltaTime;
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
