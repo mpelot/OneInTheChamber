@@ -67,13 +67,23 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y, -5, 5));
 
         //If Turning
-        if ((rbody.velocity.x < 0 && facingRight) || rbody.velocity.x > 0 && !facingRight) 
+        if ((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) 
         {
             // Flip the player
             facingRight = !facingRight;
             Vector3 scale = transform.localScale;
             scale.x *= -1;
             transform.localScale = scale;
+        }
+
+        //Update the moving backwards paramater in the animator
+        if (transform.localScale.x * rbody.velocity.x < 0) 
+        {
+            animator.SetBool("Moving Backwards", true);
+        }
+        else 
+        {
+            animator.SetBool("Moving Backwards", false);
         }
 
         //Player States
@@ -220,7 +230,10 @@ public class PlayerMovement : MonoBehaviour
         //Horizontal Speed
         goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
         rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
-        
+
+        //Update animation parameter
+        animator.SetFloat("Horizontal Input", Mathf.Abs(goalSpeed.x));
+
         //Decrements Coyote Time Timer, Input Buffer Timer, Jump Cooldown Timer, and Bullet Time Timer
         if(coyoteTimer > 0)
         {
