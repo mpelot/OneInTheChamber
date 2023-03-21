@@ -333,7 +333,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.48235297, g: 0.52156866, b: 0.61960787, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -449,9 +449,9 @@ GameObject:
   - component: {fileID: 1024808311}
   - component: {fileID: 1024808310}
   - component: {fileID: 1024808312}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -509,8 +509,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1616748479
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -12120,9 +12120,9 @@ GameObject:
   - component: {fileID: 1382153657}
   - component: {fileID: 1382153658}
   - component: {fileID: 1382153659}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12157,6 +12157,7 @@ MonoBehaviour:
   bulletForce: 10
   bulletTimeLength: 1
   bulletTimeSlowdownFactor: 0.3
+  canFire: 1
 --- !u!212 &1382153654
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12195,8 +12196,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -246511429
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: -744291929, guid: 33e8cfd8c9b0bb34b99fa2638a752330, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletForce;
     public float bulletTimeLength;
     public float bulletTimeSlowdownFactor;
+    public bool canFire = true;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -133,9 +134,10 @@ public class PlayerMovement : MonoBehaviour
         }
 		
 		//Shooting
-		if (Input.GetMouseButtonDown(0)) 
+		if (Input.GetMouseButtonDown(0) && canFire) 
         {
             shooting = true;
+            canFire = false;
             //Start bullet time timer
             bulletTimeTimer = bulletTimeLength;
             //Set time scale to the slowdown factor
@@ -275,23 +277,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        playerState = State.onGround;
-        
-        //Update the grounded parameter in the animator
-        animator.SetBool("Grounded", true);
+        if (collision.CompareTag("Wall")) 
+            {
+            playerState = State.onGround;
+
+            //Update the grounded parameter in the animator
+            animator.SetBool("Grounded", true);
+        }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        playerState = State.inAir;
+    private void OnTriggerExit2D(Collider2D collision) {
+        if (collision.CompareTag("Wall")) {
+            playerState = State.inAir;
 
-        //Update the grounded parameter in the animator
-        animator.SetBool("Grounded", false);
+            //Update the grounded parameter in the animator
+            animator.SetBool("Grounded", false);
 
-        //Starts Coyote Time Timer
-        if (jumpCooldownTimer <= 0)
-        {
-            coyoteTimer = coyoteTimeLength;
+            //Starts Coyote Time Timer
+            if (jumpCooldownTimer <= 0) {
+                coyoteTimer = coyoteTimeLength;
+            }
         }
     }
 

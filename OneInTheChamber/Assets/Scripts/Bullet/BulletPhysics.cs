@@ -8,7 +8,7 @@ public class BulletPhysics : MonoBehaviour
     public Vector2 movAngle;
     public float bulletSpeed;
     private Rigidbody2D rbody;
-	
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,5 +24,16 @@ public class BulletPhysics : MonoBehaviour
 		
 		// TODO: move this over to the rigidbody system
     }
+    // When the bullet is retrieved
+    public void Retrieve() {
+        // Destroy bullet
+        Destroy(gameObject);
+    }
 
+    // When the bullet bounces
+    private void OnCollisionEnter2D(Collision2D collision) 
+    {
+        // Enable the trigger collider for retrieval
+        GetComponentInChildren<CircleCollider2D>().enabled = true;
+    }
 }
