@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LaserGuide))]
 public class PlayerMovement : MonoBehaviour
 {
     //Movement
@@ -29,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletTimeLength;
     public float bulletTimeSlowdownFactor;
     public bool canFire = true;
+    LaserGuide laserGuide;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -52,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        laserGuide = GetComponent<LaserGuide>();
         accelValue = acceleration;
 		mainCam = Camera.main;
         wall = LayerMask.GetMask("Walls");
@@ -143,7 +146,31 @@ public class PlayerMovement : MonoBehaviour
             //Set time scale to the slowdown factor
             Time.timeScale = bulletTimeSlowdownFactor;
             Time.fixedDeltaTime = Time.timeScale * .02f;
-		}
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            canFire = true;
+        }
+
+        if (shooting)
+        {
+            // TODO: Remove redudendent copy/pasted code from below
+            // NOTE: mouse position is in screenspace!
+            // We must normalize into worldspace before we can use these coords.
+            Vector3 mousePos = Input.mousePosition;
+            // z needs to be nonzero for this to work
+            mousePos.z = mainCam.nearClipPlane;
+
+            Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
+            // Revert z transform
+            norm.z = 0;
+
+            Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
+
+            laserGuide.setLaserDirection(bulletDirection);
+            laserGuide.showLaser();
+        }
 
         //If left click is released or the timer expires:
         if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0) 
@@ -178,6 +205,7 @@ public class PlayerMovement : MonoBehaviour
                 coyoteTimer = 0;
                 jumpCooldownTimer = coyoteTimeLength;
             }
+            laserGuide.hideLaser();
         }
 
         //Keep Current Speed For Next Frame
