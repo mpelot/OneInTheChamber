@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletForce;
     public float bulletTimeLength;
     public float bulletTimeSlowdownFactor;
+    public Animator bulletTimeIndicatorAnimator;
     public bool canFire = true;
     LaserGuide laserGuide;
 
@@ -146,6 +147,7 @@ public class PlayerMovement : MonoBehaviour
             //Set time scale to the slowdown factor
             Time.timeScale = bulletTimeSlowdownFactor;
             Time.fixedDeltaTime = Time.timeScale * .02f;
+            bulletTimeIndicatorAnimator.SetBool("BulletTime", true);
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -206,6 +208,7 @@ public class PlayerMovement : MonoBehaviour
                 jumpCooldownTimer = coyoteTimeLength;
             }
             laserGuide.hideLaser();
+            bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
         }
 
         //Keep Current Speed For Next Frame
