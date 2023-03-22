@@ -12144,7 +12144,7 @@ MonoBehaviour:
   trueMaxSpeed: 20
   playerState: 0
   jumpForce: 7
-  coyoteTimeLength: 0.15
+  coyoteTimeLength: 0.06
   inputBufferLength: 0.1
   jumpCooldownLength: 0.4
   defaultGravity: 2
@@ -12156,7 +12156,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 10
   bulletTimeLength: 1
-  bulletTimeSlowdownFactor: 0.3
+  bulletTimeSlowdownFactor: 0.1
   canFire: 1
 --- !u!212 &1382153654
 SpriteRenderer:
