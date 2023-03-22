@@ -12526,6 +12526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laserDistance: 20
+  rayCastWidth: 0.25
   maxBounces: 3
 --- !u!120 &1382153661
 LineRenderer:

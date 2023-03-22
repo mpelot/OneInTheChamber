@@ -6,6 +6,7 @@ using UnityEngine;
 public class LaserGuide : MonoBehaviour
 {
     public float laserDistance;
+    public float rayCastWidth;
     public int maxBounces;
     LineRenderer lineRenderer;
     // Start is called before the first frame update
@@ -30,7 +31,44 @@ public class LaserGuide : MonoBehaviour
         int bounceCount = 1;
         while(remainingDistance > 0 && bounceCount <= maxBounces)
         {
-            RaycastHit2D hit = Physics2D.Raycast(previousBouncePosition, bounceDirection, remainingDistance, LayerMask.GetMask("Ground"));
+            Vector2 widthOffset = bounceDirection.normalized * rayCastWidth * 0.5f;
+            //Rotate width offset 90 degrees clockwise
+            widthOffset = new Vector2(widthOffset.y, -widthOffset.x);
+
+            RaycastHit2D hit1 = Physics2D.Raycast(previousBouncePosition + widthOffset, bounceDirection, remainingDistance, LayerMask.GetMask("Ground"));
+            RaycastHit2D hit2 = Physics2D.Raycast(previousBouncePosition - widthOffset, bounceDirection, remainingDistance, LayerMask.GetMask("Ground"));
+            RaycastHit2D hit;
+
+            // Determine which raycast hit first
+            if (hit1.collider != null && hit2.collider != null)
+            {
+                if (hit1.distance < hit2.distance)
+                {
+                    hit = hit1;
+                    hit.point -= widthOffset;
+                }
+                else
+                {
+                    hit = hit2;
+                    hit.point += widthOffset;
+                }
+            }
+            else if (hit1.collider != null)
+            {
+                hit = hit1;
+                hit.point -= widthOffset;
+            }
+            else if (hit2.collider != null)
+            {
+                hit = hit2;
+                hit.point += widthOffset;
+            }
+            else
+            {
+                hit = hit1;
+                hit.point -= widthOffset;
+            }
+
             if (hit.collider != null)
             {
                 linePositions.Add(hit.point);
