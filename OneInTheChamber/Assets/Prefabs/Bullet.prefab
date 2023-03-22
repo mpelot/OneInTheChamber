@@ -100,8 +100,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2e8a8f08d4892243911e897fe270f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stoppedMatirial: {fileID: 6200000, guid: 16d650aef596626419ea95f8baf7f98e, type: 2}
   movAngle: {x: 0, y: 0}
   bulletSpeed: 20
+  bounceLimit: 3
 --- !u!50 &-4931415327569981390
 Rigidbody2D:
   serializedVersion: 4

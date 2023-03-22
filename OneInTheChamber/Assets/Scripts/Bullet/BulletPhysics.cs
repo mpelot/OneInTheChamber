@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class BulletPhysics : MonoBehaviour
 {
+    public PhysicsMaterial2D stoppedMatirial;
 	[HideInInspector]
     public Vector2 movAngle;
     public float bulletSpeed;
     private Rigidbody2D rbody;
+    public int bounceLimit;
 
     // Start is called before the first frame update
     void Start()
@@ -35,5 +37,11 @@ public class BulletPhysics : MonoBehaviour
     {
         // Enable the trigger collider for retrieval
         GetComponentInChildren<CircleCollider2D>().enabled = true;
+        bounceLimit--;
+        if (bounceLimit == 0) {
+            rbody.velocity = Vector3.zero;
+            rbody.gravityScale = 1;
+            GetComponent<BoxCollider2D>().sharedMaterial = stoppedMatirial;
+        }
     }
 }
