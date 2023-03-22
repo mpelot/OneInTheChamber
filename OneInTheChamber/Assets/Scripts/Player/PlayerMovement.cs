@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(LaserGuide))]
 public class PlayerMovement : MonoBehaviour
@@ -152,7 +153,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            canFire = true;
+            SceneManager.LoadScene("Testing");
         }
 
         if (shooting)
