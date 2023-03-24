@@ -14694,7 +14694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acceleration: 8
   maxRunSpeed: 4
-  trueMaxSpeed: 20
+  trueMaxSpeed: 13
   playerState: 0
   jumpForce: 7
   coyoteTimeLength: 0.06
@@ -14887,7 +14887,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   laserDistance: 20
   rayCastWidth: 0.25
-  maxBounces: 3
+  maxBounces: 1
 --- !u!120 &1382153661
 LineRenderer:
   m_ObjectHideFlags: 0

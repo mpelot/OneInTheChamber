@@ -103,7 +103,7 @@ MonoBehaviour:
   stoppedMatirial: {fileID: 6200000, guid: 16d650aef596626419ea95f8baf7f98e, type: 2}
   movAngle: {x: 0, y: 0}
   bulletSpeed: 20
-  bounceLimit: 3
+  bounceLimit: 1
 --- !u!50 &-4931415327569981390
 Rigidbody2D:
   serializedVersion: 4
