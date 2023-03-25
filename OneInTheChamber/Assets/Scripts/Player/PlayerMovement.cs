@@ -189,8 +189,9 @@ public class PlayerMovement : MonoBehaviour
             }
             else if ((bulletDirection.y > 0 && rbody.velocity.y > 0) || (bulletDirection.y < 0 && rbody.velocity.y < 0))
             {
+                float yScale = 0.5f;
                 float newVelocityX = rbody.velocity.x + (-bulletDirection.x * bulletForce);
-                float newVelocityY = -rbody.velocity.y + (-bulletDirection.y * bulletForce);
+                float newVelocityY = (-rbody.velocity.y + (-bulletDirection.y * bulletForce)) * yScale;
                 newVelocity = new Vector2(newVelocityX, newVelocityY);
             }
 
