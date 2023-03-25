@@ -16845,6 +16845,7 @@ MonoBehaviour:
   bulletTimeIndicatorAnimator: {fileID: 1015675345}
   canFire: 1
   blast: {fileID: 2114956205}
+  redirectYScale: 1
 --- !u!212 &1382153654
 SpriteRenderer:
   m_ObjectHideFlags: 0

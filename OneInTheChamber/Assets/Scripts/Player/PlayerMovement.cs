@@ -34,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
     public bool canFire = true;
     LaserGuide laserGuide;
     public ParticleSystem blast;
+    public float redirectYScale;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -176,7 +177,10 @@ public class PlayerMovement : MonoBehaviour
 
             Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
 
-            bulletDirection = Mathf.Abs(bulletDirection.x) > Mathf.Abs(bulletDirection.y) ? Vector2.right * Mathf.Sign(bulletDirection.x) : Vector2.up * Mathf.Sign(bulletDirection.y);
+            // Snap bullet direction to 45 degree increments
+            float angle = Mathf.Atan2(bulletDirection.y, bulletDirection.x) * Mathf.Rad2Deg;
+            angle = Mathf.Round(angle / 45) * 45;
+            bulletDirection = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
 
             //Add Recoil
             Vector2 newVelocity = rbody.velocity + (-bulletDirection * bulletForce);
@@ -187,11 +191,11 @@ public class PlayerMovement : MonoBehaviour
                 float newVelocityY = rbody.velocity.y + (-bulletDirection.y * bulletForce);
                 newVelocity = new Vector2(newVelocityX, newVelocityY);
             }
-            else if ((bulletDirection.y > 0 && rbody.velocity.y > 0) || (bulletDirection.y < 0 && rbody.velocity.y < 0))
+            if ((bulletDirection.y > 0 && rbody.velocity.y > 0) || (bulletDirection.y < 0 && rbody.velocity.y < 0))
             {
-                float yScale = 0.5f;
+                
                 float newVelocityX = rbody.velocity.x + (-bulletDirection.x * bulletForce);
-                float newVelocityY = (-rbody.velocity.y + (-bulletDirection.y * bulletForce)) * yScale;
+                float newVelocityY = (-rbody.velocity.y + (-bulletDirection.y * bulletForce)) * redirectYScale;
                 newVelocity = new Vector2(newVelocityX, newVelocityY);
             }
 
