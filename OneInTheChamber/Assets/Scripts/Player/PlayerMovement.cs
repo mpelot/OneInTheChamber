@@ -33,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     public Animator bulletTimeIndicatorAnimator;
     public bool canFire = true;
     LaserGuide laserGuide;
+    public ParticleSystem blast;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -184,10 +185,20 @@ public class PlayerMovement : MonoBehaviour
             //rbody.velocity = Vector2.ClampMagnitude(newVelocity, trueMaxSpeed);
 
             longJump = false;
-            if (bulletDirection.y > 0) {
+            if (bulletDirection.y > 0) 
+            {
                 coyoteTimer = 0;
                 jumpCooldownTimer = coyoteTimeLength;
             }
+
+            if (bulletDirection == Vector2.down) 
+            {
+                animator.SetTrigger("Down Blast");
+            }
+
+            blast.transform.position = transform.position;
+            blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, bulletDirection) + 10, Vector3.back);
+            blast.Play();
 
             //Reset Parameter
             blasting = false;
