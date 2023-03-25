@@ -135,6 +135,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
+            canFire = true;
         }
 		
 		//Blasting
@@ -174,46 +175,36 @@ public class PlayerMovement : MonoBehaviour
             // Revert z transform
             norm.z = 0;
 
-            Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
+            Vector2 blastDirection = (Vector2)(norm - transform.position).normalized;
 
-            bulletDirection = Mathf.Abs(bulletDirection.x) > Mathf.Abs(bulletDirection.y) ? Vector2.right * Mathf.Sign(bulletDirection.x) : Vector2.up * Mathf.Sign(bulletDirection.y);
+            // Confine blast directions to 4
+            blastDirection = Mathf.Abs(blastDirection.x) > Mathf.Abs(blastDirection.y) ? Vector2.right * Mathf.Sign(blastDirection.x) : Vector2.up * Mathf.Sign(blastDirection.y);
 
-            //Add Recoil
-            Vector2 newVelocity = rbody.velocity + (-bulletDirection * bulletForce);
-
-            if ((bulletDirection.x > 0 && rbody.velocity.x > 0) || (bulletDirection.x < 0 && rbody.velocity.x < 0))
+            Vector2 newVelocity = rbody.velocity + (-blastDirection * bulletForce);
+            if (blastDirection.x == 0) 
             {
-                float newVelocityX = -rbody.velocity.x + (-bulletDirection.x * bulletForce);
-                float newVelocityY = rbody.velocity.y + (-bulletDirection.y * bulletForce);
-                newVelocity = new Vector2(newVelocityX, newVelocityY);
-            }
-            else if ((bulletDirection.y > 0 && rbody.velocity.y > 0) || (bulletDirection.y < 0 && rbody.velocity.y < 0))
-            {
-                float yScale = 0.5f;
-                float newVelocityX = rbody.velocity.x + (-bulletDirection.x * bulletForce);
-                float newVelocityY = (-rbody.velocity.y + (-bulletDirection.y * bulletForce)) * yScale;
-                newVelocity = new Vector2(newVelocityX, newVelocityY);
+                if (blastDirection.y < 0) 
+                {
+                    // Minimun y velocity after a downwards blast
+                    float minY = 6f;
+                    if (rbody.velocity.y + bulletForce < minY)
+                        newVelocity = new Vector2(rbody.velocity.x, minY);
+                    animator.SetTrigger("Down Blast");
+                } 
+                else 
+                {
+                    coyoteTimer = 0;
+                    jumpCooldownTimer = coyoteTimeLength;
+                }
             }
 
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
 
-            // Alternate way to clamp speed
-            //rbody.velocity = Vector2.ClampMagnitude(newVelocity, trueMaxSpeed);
-
             longJump = false;
-            if (bulletDirection.y > 0) 
-            {
-                coyoteTimer = 0;
-                jumpCooldownTimer = coyoteTimeLength;
-            }
 
-            if (bulletDirection == Vector2.down) 
-            {
-                animator.SetTrigger("Down Blast");
-            }
-
+            // Play particle effect
             blast.transform.position = transform.position;
-            blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, bulletDirection) + 10, Vector3.back);
+            blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, blastDirection) + 10, Vector3.back);
             blast.Play();
 
             //Reset Parameter
@@ -368,7 +359,6 @@ public class PlayerMovement : MonoBehaviour
         if (collision.CompareTag("Wall")) 
         {
             playerState = State.onGround;
-            canFire = true;
 
             //Update the grounded parameter in the animator
             animator.SetBool("Grounded", true);
