@@ -181,6 +181,11 @@ public class PlayerMovement : MonoBehaviour
             //Add Recoil
             Vector2 newVelocity = rbody.velocity + (-bulletDirection * bulletForce);
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
+            float dirChange = 1.5f;
+            if (rbody.velocity.magnitude < dirChange)
+            {
+                rbody.velocity = bulletDirection.normalized * dirChange;
+            }
             // Alternate way to clamp speed
             //rbody.velocity = Vector2.ClampMagnitude(newVelocity, trueMaxSpeed);
 
