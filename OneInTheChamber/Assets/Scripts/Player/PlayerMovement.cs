@@ -181,23 +181,25 @@ public class PlayerMovement : MonoBehaviour
             //Add Recoil
             Vector2 newVelocity = rbody.velocity + (-bulletDirection * bulletForce);
 
-            if ((bulletDirection.x > 0 && newVelocity.x > 0) || (bulletDirection.x < 0 && newVelocity.x < 0))
+            if ((bulletDirection.x > 0 && rbody.velocity.x > 0) || (bulletDirection.x < 0 && rbody.velocity.x < 0))
             {
-                rbody.velocity = new Vector2(Mathf.Clamp(-newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
+                float newVelocityX = -rbody.velocity.x + (-bulletDirection.x * bulletForce);
+                float newVelocityY = rbody.velocity.y + (-bulletDirection.y * bulletForce);
+                newVelocity = new Vector2(newVelocityX, newVelocityY);
             }
-            else if ((bulletDirection.y > 0 && newVelocity.y > 0) || (bulletDirection.y < 0 && newVelocity.y < 0))
+            else if ((bulletDirection.y > 0 && rbody.velocity.y > 0) || (bulletDirection.y < 0 && rbody.velocity.y < 0))
             {
-                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(-newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
-            }
-            else
-            {
-                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
+                float newVelocityX = rbody.velocity.x + (-bulletDirection.x * bulletForce);
+                float newVelocityY = -rbody.velocity.y + (-bulletDirection.y * bulletForce);
+                newVelocity = new Vector2(newVelocityX, newVelocityY);
             }
 
-                // Alternate way to clamp speed
-                //rbody.velocity = Vector2.ClampMagnitude(newVelocity, trueMaxSpeed);
+            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
 
-                longJump = false;
+            // Alternate way to clamp speed
+            //rbody.velocity = Vector2.ClampMagnitude(newVelocity, trueMaxSpeed);
+
+            longJump = false;
             if (bulletDirection.y > 0) 
             {
                 coyoteTimer = 0;
