@@ -348,7 +348,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    public void StayGround()
     {
         //Input Buffer Jumping
         if(inputBufferTimer > 0)
@@ -363,29 +363,24 @@ public class PlayerMovement : MonoBehaviour
         playerState = State.onGround;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void EnterGround()
     {
-        if (collision.CompareTag("Wall")) 
-        {
             playerState = State.onGround;
             canFire = true;
 
             //Update the grounded parameter in the animator
             animator.SetBool("Grounded", true);
-        }
     }
 
-    private void OnTriggerExit2D(Collider2D collision) {
-        if (collision.CompareTag("Wall")) {
-            playerState = State.inAir;
+    public void ExitGround() {
+        playerState = State.inAir;
 
-            //Update the grounded parameter in the animator
-            animator.SetBool("Grounded", false);
+        //Update the grounded parameter in the animator
+        animator.SetBool("Grounded", false);
 
-            //Starts Coyote Time Timer
-            if (jumpCooldownTimer <= 0) {
-                coyoteTimer = coyoteTimeLength;
-            }
+        //Starts Coyote Time Timer
+        if (jumpCooldownTimer <= 0) {
+            coyoteTimer = coyoteTimeLength;
         }
     }
 
