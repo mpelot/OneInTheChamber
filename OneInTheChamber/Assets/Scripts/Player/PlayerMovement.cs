@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class PlayerMovement : MonoBehaviour
 {
     //Movement
+    [Header("Movement")]
     public float acceleration;
     public float maxRunSpeed;
     public float trueMaxSpeed;
@@ -14,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     public State playerState;
 
     //Jumping
+    [Header("Jumping")]
     public float jumpForce;
     public float coyoteTimeLength;
     public float inputBufferLength;
@@ -25,7 +27,8 @@ public class PlayerMovement : MonoBehaviour
     public float wallHangTime;
     public float wallGravity;
 
-    //Shooting
+    //Firing
+    [Header("Firing")]
 	public GameObject bulletPrefab;
     public float bulletForce;
     public float bulletTimeLength;
@@ -34,6 +37,11 @@ public class PlayerMovement : MonoBehaviour
     public bool canFire = true;
     LaserGuide laserGuide;
     public ParticleSystem blast;
+
+    // Ground Detection
+    [Header("Ground Detection")]
+    [SerializeField] BoxCollider2D coll;
+    [SerializeField] LayerMask groundLayer;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -91,6 +99,38 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("Moving Backwards", false);
         }
 
+        // Check if on ground
+        if (isGrounded() && playerState == State.inAir) 
+        {
+            canFire = true;
+            
+            //Sets Gravity Back To Normal
+            rbody.gravityScale = defaultGravity;
+
+            //Input Buffer Jumping
+            if (inputBufferTimer > 0) 
+            {
+                Jump();
+            } 
+            else 
+            {
+                playerState = State.onGround;
+                animator.SetBool("Grounded", true);
+            }
+        } 
+        else if (!isGrounded() && playerState == State.onGround)
+        {
+            playerState = State.inAir;
+
+            //Update the grounded parameter in the animator
+            animator.SetBool("Grounded", false);
+
+            //Starts Coyote Time Timer
+            if (jumpCooldownTimer <= 0) {
+                coyoteTimer = coyoteTimeLength;
+            }
+        }
+
         //Player States
         //IN AIR
         if (playerState == State.inAir)
@@ -135,7 +175,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
-            canFire = true;
         }
 		
 		//Blasting
@@ -339,44 +378,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private bool isGrounded() 
     {
-        //Input Buffer Jumping
-        if(inputBufferTimer > 0)
-        {
-            Jump();
-        }
-        
-        //Sets Gravity Back To Normal
-        rbody.gravityScale = defaultGravity;
-
-        //Sets In-Air to false
-        playerState = State.onGround;
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Wall")) 
-        {
-            playerState = State.onGround;
-
-            //Update the grounded parameter in the animator
-            animator.SetBool("Grounded", true);
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision) {
-        if (collision.CompareTag("Wall")) {
-            playerState = State.inAir;
-
-            //Update the grounded parameter in the animator
-            animator.SetBool("Grounded", false);
-
-            //Starts Coyote Time Timer
-            if (jumpCooldownTimer <= 0) {
-                coyoteTimer = coyoteTimeLength;
-            }
-        }
+        return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .02f, groundLayer);
     }
 
     private void Jump()
