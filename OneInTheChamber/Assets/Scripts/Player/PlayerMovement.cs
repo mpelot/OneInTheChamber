@@ -33,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
     public Animator bulletTimeIndicatorAnimator;
     public bool canFire = true;
     LaserGuide laserGuide;
+    public ParticleSystem blast;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -48,9 +49,8 @@ public class PlayerMovement : MonoBehaviour
     private bool longJump = false;
     private float fastFallModifier;
     private bool shooting = false;
+    private bool blasting = false;
     private Camera mainCam;
-    private LayerMask wall;
-    private float lastSpeed;
 
     void Start()
     {
@@ -59,7 +59,6 @@ public class PlayerMovement : MonoBehaviour
         laserGuide = GetComponent<LaserGuide>();
         accelValue = acceleration;
 		mainCam = Camera.main;
-        wall = LayerMask.GetMask("Walls");
         fastFallModifier = 1;
         playerState = State.inAir;
     }
@@ -136,11 +135,18 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
+            canFire = true;
         }
 		
-		//Shooting
+		//Blasting
 		if (Input.GetMouseButtonDown(0) && canFire) 
         {
+            blasting = true;
+            canFire = false;
+        }
+
+        //Shooting
+        if (Input.GetMouseButtonDown(1) && canFire) {
             shooting = true;
             canFire = false;
             //Start bullet time timer
@@ -151,14 +157,62 @@ public class PlayerMovement : MonoBehaviour
             bulletTimeIndicatorAnimator.SetBool("BulletTime", true);
         }
 
+        //Reload Scene
         if (Input.GetKeyDown(KeyCode.R))
         {
             SceneManager.LoadScene("Testing");
         }
 
+        if (blasting) {
+            //Fire
+            // NOTE: mouse position is in screenspace!
+            // We must normalize into worldspace before we can use these coords.
+            Vector3 mousePos = Input.mousePosition;
+            // z needs to be nonzero for this to work
+            mousePos.z = mainCam.nearClipPlane;
+
+            Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
+            // Revert z transform
+            norm.z = 0;
+
+            Vector2 blastDirection = (Vector2)(norm - transform.position).normalized;
+
+            // Confine blast directions to 4
+            blastDirection = Mathf.Abs(blastDirection.x) > Mathf.Abs(blastDirection.y) ? Vector2.right * Mathf.Sign(blastDirection.x) : Vector2.up * Mathf.Sign(blastDirection.y);
+
+            Vector2 newVelocity = rbody.velocity + (-blastDirection * bulletForce);
+            if (blastDirection.x == 0) 
+            {
+                if (blastDirection.y < 0) 
+                {
+                    // Minimun y velocity after a downwards blast
+                    float minY = 6f;
+                    if (rbody.velocity.y + bulletForce < minY)
+                        newVelocity = new Vector2(rbody.velocity.x, minY);
+                    animator.SetTrigger("Down Blast");
+                } 
+                else 
+                {
+                    coyoteTimer = 0;
+                    jumpCooldownTimer = coyoteTimeLength;
+                }
+            }
+
+            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
+
+            longJump = false;
+
+            // Play particle effect
+            blast.transform.position = transform.position;
+            blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, blastDirection) + 10, Vector3.back);
+            blast.Play();
+
+            //Reset Parameter
+            blasting = false;
+        }
+
         if (shooting)
         {
-            // TODO: Remove redudendent copy/pasted code from below
             // NOTE: mouse position is in screenspace!
             // We must normalize into worldspace before we can use these coords.
             Vector3 mousePos = Input.mousePosition;
@@ -178,42 +232,35 @@ public class PlayerMovement : MonoBehaviour
         //If left click is released or the timer expires:
         if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0) 
         {
-            //Fire
+            if (bulletTimeTimer < 0) 
+            {
+                //Fire
+                // NOTE: mouse position is in screenspace!
+                // We must normalize into worldspace before we can use these coords.
+                Vector3 mousePos = Input.mousePosition;
+                // z needs to be nonzero for this to work
+                mousePos.z = mainCam.nearClipPlane;
+
+                Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
+                // Revert z transform
+                norm.z = 0;
+
+                Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
+
+                GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+                newBullet.GetComponent<BulletPhysics>().movAngle = bulletDirection;
+
+                laserGuide.hideLaser();
+                bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
+            }
+            
             //Reset bullet time parameters
             shooting = false;
             bulletTimeTimer = 0;
             //Reset the time scale
             Time.timeScale = 1;
             Time.fixedDeltaTime = .02f;
-
-            // NOTE: mouse position is in screenspace!
-            // We must normalize into worldspace before we can use these coords.
-            Vector3 mousePos = Input.mousePosition;
-            // z needs to be nonzero for this to work
-            mousePos.z = mainCam.nearClipPlane;
-
-            Vector3 norm = mainCam.ScreenToWorldPoint(mousePos);
-            // Revert z transform
-            norm.z = 0;
-
-            Vector2 bulletDirection = (Vector2)(norm - transform.position).normalized;
-            GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-            newBullet.GetComponent<BulletPhysics>().movAngle = bulletDirection;
-
-            //Add Recoil
-            rbody.velocity += -bulletDirection * bulletForce;
-            longJump = false;
-            if(bulletDirection.y > 0) 
-            {
-                coyoteTimer = 0;
-                jumpCooldownTimer = coyoteTimeLength;
-            }
-            laserGuide.hideLaser();
-            bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
         }
-
-        //Keep Current Speed For Next Frame
-        lastSpeed = rbody.velocity.x;
     }
 
     void FixedUpdate()
@@ -310,7 +357,7 @@ public class PlayerMovement : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Wall")) 
-            {
+        {
             playerState = State.onGround;
 
             //Update the grounded parameter in the animator
