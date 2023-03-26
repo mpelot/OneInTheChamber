@@ -185,7 +185,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Shooting
-        if (Input.GetMouseButtonDown(1) && canFire) {
+        if (Input.GetMouseButtonDown(1) && canFire) 
+        {
             shooting = true;
             canFire = false;
             //Start bullet time timer
@@ -202,7 +203,11 @@ public class PlayerMovement : MonoBehaviour
             SceneManager.LoadScene("Testing");
         }
 
-        if (blasting) {
+        if (blasting) 
+        {
+            //Reset Parameter
+            blasting = false;
+
             //Fire
             // NOTE: mouse position is in screenspace!
             // We must normalize into worldspace before we can use these coords.
@@ -234,7 +239,13 @@ public class PlayerMovement : MonoBehaviour
                 {
                     coyoteTimer = 0;
                     jumpCooldownTimer = coyoteTimeLength;
+                    Debug.Log("fire");
+                    
                 }
+            }
+            else if (playerState == State.inAir && facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0) 
+            {
+                animator.SetTrigger("Back Blast");
             }
 
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
@@ -246,8 +257,7 @@ public class PlayerMovement : MonoBehaviour
             blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, blastDirection) + 10, Vector3.back);
             blast.Play();
 
-            //Reset Parameter
-            blasting = false;
+            
         }
 
         if (shooting)
@@ -271,6 +281,7 @@ public class PlayerMovement : MonoBehaviour
         //If left click is released or the timer expires:
         if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0) 
         {
+            shooting = false;
             if (bulletTimeTimer < 0) 
             {
                 //Fire
@@ -294,7 +305,6 @@ public class PlayerMovement : MonoBehaviour
             }
             
             //Reset bullet time parameters
-            shooting = false;
             bulletTimeTimer = 0;
             //Reset the time scale
             Time.timeScale = 1;
