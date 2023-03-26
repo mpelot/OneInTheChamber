@@ -284,6 +284,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: PlayerDownBlast_8
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3b854f374284d8498076bcab8a466f5
+      internalID: 467868296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerDownBlast_9
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 0
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2464306d935c84843925c37eb838a94a
+      internalID: 58822799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -297,12 +339,14 @@ TextureImporter:
     nameFileIdTable:
       PlayerDownBlast_1: 1294694701
       PlayerDownBlast_2: 565932853
+      PlayerDownBlast_8: 467868296
       PlayerDownBlast_5: -995272548
       PlayerDownBlast_7: 299767965
       PlayerDownBlast_3: 429015402
       PlayerDownBlast_4: 1001804283
       PlayerDownBlast_0: -1452324793
       PlayerDownBlast_6: -493751715
+      PlayerDownBlast_9: 58822799
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
