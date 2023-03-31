@@ -4,14 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(LaserGuide))]
-public class PlayerMovement : MonoBehaviour
-{
+public class PlayerMovement : MonoBehaviour {
     //Movement
     [Header("Movement")]
     public float acceleration;
     public float maxRunSpeed;
     public float trueMaxSpeed;
-    public enum State {inAir, onGround, wallCling};
+    public enum State { inAir, onGround, wallCling };
     public State playerState;
 
     //Jumping
@@ -29,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Firing
     [Header("Firing")]
-	public GameObject bulletPrefab;
+    public GameObject bulletPrefab;
     public float bulletForce;
     public float bulletTimeLength;
     public float bulletTimeSlowdownFactor;
@@ -60,19 +59,17 @@ public class PlayerMovement : MonoBehaviour
     private bool blasting = false;
     private Camera mainCam;
 
-    void Start()
-    {
+    void Start() {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         laserGuide = GetComponent<LaserGuide>();
         accelValue = acceleration;
-		mainCam = Camera.main;
+        mainCam = Camera.main;
         fastFallModifier = 1;
         playerState = State.inAir;
     }
 
-    private void Update()
-    {
+    private void Update() {
         //Update the speed parameter in the animator
         animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1, -1, 5));
 
@@ -80,113 +77,118 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y, -5, 5));
 
         //If Turning
-        if ((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) 
-        {
+        if ((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) {
             // Flip the player
-            facingRight = !facingRight;
-            Vector3 scale = transform.localScale;
-            scale.x *= -1;
-            transform.localScale = scale;
+            Flip();
         }
 
         //Update the moving backwards paramater in the animator
-        if (transform.localScale.x * rbody.velocity.x < 0) 
-        {
+        if (transform.localScale.x * rbody.velocity.x < 0) {
             animator.SetBool("Moving Backwards", true);
-        }
-        else 
-        {
+        } else {
             animator.SetBool("Moving Backwards", false);
         }
 
-        // Check if on ground
-        if (isGrounded() && playerState == State.inAir) 
-        {
+        // Determine Current State
+        if (isGrounded() && playerState != State.onGround) {
             canFire = true;
-            
+
             //Sets Gravity Back To Normal
             rbody.gravityScale = defaultGravity;
 
             //Input Buffer Jumping
-            if (inputBufferTimer > 0) 
-            {
+            if (inputBufferTimer > 0) {
                 Jump();
-            } 
-            else 
-            {
+            } else {
                 playerState = State.onGround;
                 animator.SetBool("Grounded", true);
             }
-        } 
-        else if (!isGrounded() && playerState == State.onGround)
-        {
-            playerState = State.inAir;
+        } else if (!isGrounded() && isClinging() && playerState != State.wallCling) {
 
+            rbody.gravityScale = defaultGravity;
+
+            //Input Buffer Jumping
+            if (inputBufferTimer > 0) {
+                WallJump();
+            } else {
+                playerState = State.wallCling;
+                //animator.SetBool("Grounded", true);
+            }
+        } else if (!isGrounded() && !isClinging() && playerState != State.inAir) {
             //Update the grounded parameter in the animator
             animator.SetBool("Grounded", false);
 
             //Starts Coyote Time Timer
-            if (jumpCooldownTimer <= 0) {
+            if (jumpCooldownTimer <= 0 && playerState == State.onGround) {
                 coyoteTimer = coyoteTimeLength;
             }
+            playerState = State.inAir;
         }
+
 
         //Player States
         //IN AIR
-        if (playerState == State.inAir)
-        {
+        if (playerState == State.inAir) {
             //Restrict Horizontal Movement In Air
             accelValue = .7f * acceleration;
 
             //If Jumping
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
+            if (Input.GetKeyDown(KeyCode.Space)) {
                 //If Coyote Timer Active, Jump
-                if (coyoteTimer > 0)
-                {
+                if (coyoteTimer > 0) {
                     Jump();
-                }
-                else
-                {
+                } else {
                     //Sets Input Buffer Timer
                     inputBufferTimer = inputBufferLength;
                 }
             }
 
             //Enable Fast Falling
-            if (Input.GetKey(KeyCode.S))
-            {
+            if (Input.GetKey(KeyCode.S)) {
                 fastFallModifier = 1.2f;
                 longJump = false;
             }
 
             //Disable Long Jump
-            if (Input.GetKeyUp(KeyCode.Space) || rbody.velocity.y <= 0)
-            {
+            if (Input.GetKeyUp(KeyCode.Space) || rbody.velocity.y <= 0) {
                 longJump = false;
             }
         }
 
         //ON GROUND
-        else if (playerState == State.onGround)
-        {
+        else if (playerState == State.onGround) {
             //Jump
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
+            if (Input.GetKeyDown(KeyCode.Space)) {
                 Jump();
             }
         }
-		
-		//Blasting
-		if (Input.GetMouseButtonDown(0) && canFire) 
-        {
+
+        //ON WALL
+        else if (playerState == State.wallCling) {
+            /*
+            if (rbody.velocity.y < 0) {
+                rbody.gravityScale = wallGravity;
+            } else {
+                rbody.gravityScale = defaultGravity;
+            }
+            */
+            if (rbody.velocity.y < -2f) {
+                rbody.velocity = new Vector2(rbody.velocity.x, -2f);
+            }
+            //Jump
+            if (Input.GetKeyDown(KeyCode.Space)) {
+                WallJump();
+            }
+        }
+
+        //Blasting
+        if (Input.GetMouseButtonDown(0) && canFire) {
             blasting = true;
             canFire = false;
         }
 
         //Shooting
-        if (Input.GetMouseButtonDown(1) && canFire) 
-        {
+        if (Input.GetMouseButtonDown(1) && canFire) {
             shooting = true;
             canFire = false;
             //Start bullet time timer
@@ -198,13 +200,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //Reload Scene
-        if (Input.GetKeyDown(KeyCode.R))
-        {
+        if (Input.GetKeyDown(KeyCode.R)) {
             SceneManager.LoadScene("Testing");
         }
 
-        if (blasting) 
-        {
+        if (blasting) {
             //Reset Parameter
             blasting = false;
 
@@ -225,26 +225,20 @@ public class PlayerMovement : MonoBehaviour
             blastDirection = Mathf.Abs(blastDirection.x) > Mathf.Abs(blastDirection.y) ? Vector2.right * Mathf.Sign(blastDirection.x) : Vector2.up * Mathf.Sign(blastDirection.y);
 
             Vector2 newVelocity = rbody.velocity + (-blastDirection * bulletForce);
-            if (blastDirection.x == 0) 
-            {
-                if (blastDirection.y < 0) 
-                {
+            if (blastDirection.x == 0) {
+                if (blastDirection.y < 0) {
                     // Minimun y velocity after a downwards blast
                     float minY = 6f;
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
                     animator.SetTrigger("Down Blast");
-                } 
-                else 
-                {
+                } else {
                     coyoteTimer = 0;
                     jumpCooldownTimer = coyoteTimeLength;
                     Debug.Log("fire");
-                    
+
                 }
-            }
-            else if (playerState == State.inAir && facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0) 
-            {
+            } else if (playerState == State.inAir && facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0) {
                 animator.SetTrigger("Back Blast");
             }
 
@@ -257,11 +251,10 @@ public class PlayerMovement : MonoBehaviour
             blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, blastDirection) + 10, Vector3.back);
             blast.Play();
 
-            
+
         }
 
-        if (shooting)
-        {
+        if (shooting) {
             // NOTE: mouse position is in screenspace!
             // We must normalize into worldspace before we can use these coords.
             Vector3 mousePos = Input.mousePosition;
@@ -279,11 +272,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //If left click is released or the timer expires:
-        if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0) 
-        {
+        if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0) {
             shooting = false;
-            if (bulletTimeTimer < 0) 
-            {
+            if (bulletTimeTimer < 0) {
                 //Fire
                 // NOTE: mouse position is in screenspace!
                 // We must normalize into worldspace before we can use these coords.
@@ -303,7 +294,7 @@ public class PlayerMovement : MonoBehaviour
                 laserGuide.hideLaser();
                 bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
             }
-            
+
             //Reset bullet time parameters
             bulletTimeTimer = 0;
             //Reset the time scale
@@ -312,46 +303,35 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
         //Player States
         //IN AIR
-        if (playerState == State.inAir)
-        {
+        if (playerState == State.inAir) {
             //If B-Hopping, Change Max Speed settings to keep current momentum
-            if (Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
-            {
+            if (Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal"))) {
                 currentMaxSpeed = Mathf.Abs(rbody.velocity.x);
-            }
-            else
-            {
+            } else {
                 currentMaxSpeed = maxRunSpeed;
             }
-            
+
             //Variable Jump Height
-            if (longJump == false && rbody.gravityScale <= maxGravity)
-            {
+            if (longJump == false && rbody.gravityScale <= maxGravity) {
                 //If Short Jump or Ended Long Jump
                 rbody.gravityScale = fallingAccel * fastFallModifier;
-            }
-            else if (longJump == true && rbody.velocity.y >= 0)
-            {
+            } else if (longJump == true && rbody.velocity.y >= 0) {
                 //If Long Jumping
                 rbody.gravityScale = longJumpGravity;
             }
         }
 
         //ON GROUND
-        else if (playerState == State.onGround)
-        {
+        else if (playerState == State.onGround) {
             //If Decelerating
-            if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
-            {
+            if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x)) {
                 accelValue = 1.75f * acceleration;
             }
             //If Accelerating
-            else
-            {
+            else {
                 accelValue = acceleration;
             }
             currentMaxSpeed = maxRunSpeed;
@@ -392,6 +372,18 @@ public class PlayerMovement : MonoBehaviour
     {
         return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .02f, groundLayer);
     }
+    private bool isClinging() {
+        Vector2 dir = facingRight ? Vector2.right : Vector2.left;
+        bool holdingIntoWall = facingRight ? Input.GetAxisRaw("Horizontal") > 0 : Input.GetAxisRaw("Horizontal") < 0; 
+        return holdingIntoWall && Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, dir, .02f, groundLayer);
+    }
+
+    private void Flip() {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
 
     private void Jump()
     {
@@ -405,6 +397,24 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
+            longJump = false;
+        }
+        fastFallModifier = 1;
+    }
+
+    private void WallJump() {
+        float magnitude = Mathf.Sqrt((jumpForce * jumpForce) / 2);
+        rbody.velocity = facingRight ? magnitude * new Vector2(-1, 1) : magnitude * new Vector2(1, 1);
+
+        Flip();
+        canFire = true;
+
+        coyoteTimer = 0;
+        jumpCooldownTimer = jumpCooldownLength;
+        //Long Jump Must Have Space Held Down (In case using Input Buffering)
+        if (Input.GetKey(KeyCode.Space)) {
+            longJump = true;
+        } else {
             longJump = false;
         }
         fastFallModifier = 1;
