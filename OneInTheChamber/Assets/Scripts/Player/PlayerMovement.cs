@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     public float wallGravity;
     public float wallThreshhold;
     public float wallSpeedLoss;
+    public float wallSpeedDecay;
 
     //Firing
     [Header("Firing")]
@@ -47,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rbody;
     private Animator animator;
-    private bool facingRight = true;
+    public bool facingRight = true;
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
@@ -61,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
     private float fastFallModifier;
     private bool shooting = false;
     private Camera mainCam;
+    public float lastSpeed;
 
     void Start()
     {
@@ -286,12 +288,16 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("Grounded", true);
             }
             //WallCling Transition
-            if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && rbody.velocity.x == 0)
+            if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
                 rbody.gravityScale = wallGravity;
                 animator.SetBool("Wallclinging", true);
                 rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * wallSpeedLoss);
+            }
+            else if(!isOnWall())
+            {
+                lastSpeed = rbody.velocity.x;
             }
         }
         // ON GROUND
@@ -325,10 +331,10 @@ public class PlayerMovement : MonoBehaviour
         // WALL CLING
         else if (playerState == State.wallCling)
         {
-            if (rbody.velocity.y < -2f)
+            if(Mathf.Abs(lastSpeed) > 0)
             {
-                rbody.velocity = new Vector2(rbody.velocity.x, -2f);
-            }
+                lastSpeed -= Mathf.Sign(lastSpeed) * wallSpeedDecay * Time.fixedDeltaTime;
+            } 
             if (holdingForward)
             {
                 wallStickTimer = wallStickTime;
@@ -394,7 +400,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnWall()
     {
         Vector2 dir = facingRight ? Vector2.right : Vector2.left;
-        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .1f) , 0f, dir, .02f, groundLayer);
+        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .3f) , 0f, dir, .02f, groundLayer);
     }
 
     private void Flip()
@@ -417,9 +423,20 @@ public class PlayerMovement : MonoBehaviour
 
     private void WallJump()
     {
-        float magnitude = Mathf.Sqrt((jumpForce * jumpForce) / 2);
-        rbody.velocity = facingRight ? magnitude * new Vector2(-1, 1) : magnitude * new Vector2(1, 1);
-        canBlast = true;
+        float magnitude = 0;
+        if (Mathf.Abs(lastSpeed) > maxRunSpeed)
+        {
+            magnitude = -lastSpeed;
+        }
+        else if (transform.localScale.x == -1)
+        {
+            magnitude = maxRunSpeed;
+        }
+        else
+        {
+            magnitude = -maxRunSpeed;
+        }
+        rbody.velocity = new Vector2(magnitude, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
 
