@@ -24029,7 +24029,7 @@ MonoBehaviour:
   longJumpGravity: 1.75
   fallingAccel: 3
   maxGravity: 6
-  wallHangTime: 0.1
+  wallStickTime: 0.2
   wallGravity: 0.4
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 10
