@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletTimeLength;
     public float bulletTimeSlowdownFactor;
     public Animator bulletTimeIndicatorAnimator;
-    public bool canFire = true;
+    public bool canBlast = true;
     LaserGuide laserGuide;
     public ParticleSystem blast;
 
@@ -58,7 +58,6 @@ public class PlayerMovement : MonoBehaviour
     private bool longJump = false;
     private float fastFallModifier;
     private bool shooting = false;
-    private bool blasting = false;
     private Camera mainCam;
 
     void Start()
@@ -102,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
         // Determine Current State
         if (isGrounded() && playerState != State.onGround)  // If landing:
         {
-            canFire = true;
+            canBlast = true;
             animator.SetBool("Wallclinging", false);
 
             // Reset WallStickTimer
@@ -166,7 +165,6 @@ public class PlayerMovement : MonoBehaviour
             playerState = State.inAir;
         }
 
-
         // Player States
         // IN AIR
         if (playerState == State.inAir)
@@ -223,36 +221,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Blasting
-        if (Input.GetMouseButtonDown(0) && canFire)
+        if (Input.GetMouseButtonDown(0) && canBlast)
         {
-            blasting = true;
-            canFire = false;
-        }
-
-        // Shooting
-        if (Input.GetMouseButtonDown(1) && canFire)
-        {
-            shooting = true;
-            canFire = false;
-
-            // Start bullet time timer
-            bulletTimeTimer = bulletTimeLength;
-
-            // Set time scale to the slowdown factor
-            Time.timeScale = bulletTimeSlowdownFactor;
-            Time.fixedDeltaTime = Time.timeScale * .02f;
-            bulletTimeIndicatorAnimator.SetBool("BulletTime", true);
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            // Reload Scene
-            SceneManager.LoadScene("Testing");
-        }
-
-        if (blasting)
-        {
-            blasting = false;
+            canBlast = false;
 
             Vector2 blastDirection = getVectorFromPlayerToMouse();
 
@@ -291,33 +262,47 @@ public class PlayerMovement : MonoBehaviour
             blast.Play();
         }
 
-        if (shooting)
+        // Shooting
+        if (Input.GetMouseButtonDown(1) && !shooting)
         {
+            shooting = true;
+            canBlast = false;
+            
+            // Start bullet time timer
+            bulletTimeTimer = bulletTimeLength;
+            
+            // Set time scale to the slowdown factor
+            Time.timeScale = bulletTimeSlowdownFactor;
+            Time.fixedDeltaTime = Time.timeScale * .02f;
+            bulletTimeIndicatorAnimator.SetBool("BulletTime", true);
+        }
+        if (shooting) {
             Vector2 laserDirection = getVectorFromPlayerToMouse();
             laserGuide.setLaserDirection(laserDirection);
             laserGuide.showLaser();
         }
-
-        // If left click is released or the timer expires:
-        if (Input.GetMouseButtonUp(0) && shooting || bulletTimeTimer < 0)
+        if (bulletTimeTimer < 0)
         {
             shooting = false;
-            if (bulletTimeTimer < 0)
-            {
-                Vector2 laserDirection = getVectorFromPlayerToMouse();
+            Vector2 laserDirection = getVectorFromPlayerToMouse();
 
-                GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-                newBullet.GetComponent<BulletPhysics>().movAngle = laserDirection;
+            GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            newBullet.GetComponent<BulletPhysics>().movAngle = laserDirection;
 
-                laserGuide.hideLaser();
-                bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
-            }
+            laserGuide.hideLaser();
+            bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
 
             // Reset bullet time parameters
             bulletTimeTimer = 0;
             // Reset the time scale
             Time.timeScale = 1;
             Time.fixedDeltaTime = .02f;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            // Reload Scene
+            SceneManager.LoadScene("Testing");
         }
     }
 
@@ -421,7 +406,7 @@ public class PlayerMovement : MonoBehaviour
     {
         float magnitude = Mathf.Sqrt((jumpForce * jumpForce) / 2);
         rbody.velocity = facingRight ? magnitude * new Vector2(-1, 1) : magnitude * new Vector2(1, 1);
-        canFire = true;
+        canBlast = true;
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
 
