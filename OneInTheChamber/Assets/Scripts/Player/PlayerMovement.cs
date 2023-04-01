@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxRunSpeed;
     public float trueMaxSpeed;
     public enum State { inAir, onGround, wallCling };
-    public State playerState;
+    public State playerState = State.inAir;
 
     //Jumping
     [Header("Jumping")]
@@ -26,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
     public float maxGravity;
     public float wallStickTime;
     public float wallGravity;
+    public float wallThreshhold;
+    public float wallSpeedLoss;
 
     //Firing
     [Header("Firing")]
@@ -98,79 +100,10 @@ public class PlayerMovement : MonoBehaviour
         // Calulate if the player is holding in the direction they are facing
         holdingForward = facingRight ? goalSpeed.x > 0 : goalSpeed.x < 0;
 
-        // Determine Current State
-        if (isGrounded() && playerState != State.onGround)  // If landing:
-        {
-            canBlast = true;
-            animator.SetBool("Wallclinging", false);
-
-            // Reset WallStickTimer
-            wallStickTimer = 0;
-
-            // Set Gravity Back To Normal
-            rbody.gravityScale = defaultGravity;
-
-            // If wallclinging, flip player to match animation
-            if (playerState == State.wallCling)
-                Flip();
-
-            // Input Buffer Jumping
-            if (inputBufferTimer > 0)
-            {
-                Jump();
-            }
-            else
-            {
-                playerState = State.onGround;
-                animator.SetBool("Grounded", true);
-            }
-        }
-        else if (!isGrounded() && isOnWall() && holdingForward) // If clinging to wall
-        {
-            // Start WallStickTimer
-            wallStickTimer = wallStickTime;
-            if (playerState != State.wallCling)  // If first contact with wall:
-            {
-                rbody.gravityScale = defaultGravity;
-                animator.SetBool("Grounded", false);
-
-                // Input Buffer Jumping
-                if (inputBufferTimer > 0)
-                {
-                    WallJump();
-                }
-                else
-                {
-                    playerState = State.wallCling;
-                    animator.SetBool("Wallclinging", true);
-                }
-            }
-        }
-        else if (!isGrounded() && !(isOnWall() && wallStickTimer > 0) && playerState != State.inAir)  // If exiting from a surface:
-        {
-            // Update the grounded parameter in the animator
-            animator.SetBool("Grounded", false);
-            animator.SetBool("Wallclinging", false);
-            wallStickTimer = 0;
-
-            // If wallclinging, flip player to match animation
-            if (playerState == State.wallCling)
-                Flip();
-
-            // Start Coyote Time Timer
-            if (jumpCooldownTimer <= 0 && playerState == State.onGround)
-            {
-                coyoteTimer = coyoteTimeLength;
-            }
-            playerState = State.inAir;
-        }
-
-        // Player States
+        // Player States Input-Based Calculations
         // IN AIR
         if (playerState == State.inAir)
         {
-            // Restrict Horizontal Movement In Air
-            accelValue = .7f * acceleration;
 
             // If Jumping
             if (Input.GetKeyDown(KeyCode.Space))
@@ -199,21 +132,19 @@ public class PlayerMovement : MonoBehaviour
             {
                 longJump = false;
             }
-        }
 
-        // ON GROUND (And Jumping)
-        else if (playerState == State.onGround && Input.GetKeyDown(KeyCode.Space))
+        }
+        // ON GROUND
+        else if (playerState == State.onGround)
         {
-            Jump();
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
         }
-
         // ON WALL
         else if (playerState == State.wallCling)
         {
-            if (rbody.velocity.y < -2f)
-            {
-                rbody.velocity = new Vector2(rbody.velocity.x, -2f);
-            }
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 WallJump();
@@ -224,6 +155,10 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
             canBlast = false;
+
+            playerState = State.inAir;
+            animator.SetBool("Wallclinging", false);
+            wallStickTimer = 0;
 
             Vector2 blastDirection = getVectorFromPlayerToMouse();
 
@@ -240,6 +175,7 @@ public class PlayerMovement : MonoBehaviour
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
                     animator.SetTrigger("Down Blast");
+                    animator.SetBool("Grounded", false);
                 }
                 else
                 {
@@ -265,6 +201,10 @@ public class PlayerMovement : MonoBehaviour
         // Shooting
         if (Input.GetMouseButtonDown(1) && !shooting)
         {
+            playerState = State.inAir;
+            animator.SetBool("Wallclinging", false);
+            wallStickTimer = 0;
+
             shooting = true;
             canBlast = false;
             
@@ -312,6 +252,10 @@ public class PlayerMovement : MonoBehaviour
         // IN AIR
         if (playerState == State.inAir)
         {
+
+            // Restrict Horizontal Movement In Air
+            accelValue = .7f * acceleration;
+
             // If B-Hopping, Change Max Speed settings to keep current momentum
             if (Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
             {
@@ -333,11 +277,30 @@ public class PlayerMovement : MonoBehaviour
                 // If Long Jumping
                 rbody.gravityScale = longJumpGravity;
             }
-        }
 
+            //OnGround Transtion
+            if(isGrounded() && rbody.velocity.y <= 0)
+            {
+                playerState = State.onGround;
+                rbody.gravityScale = defaultGravity;
+                animator.SetBool("Grounded", true);
+            }
+            //WallCling Transition
+            if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && rbody.velocity.x == 0)
+            {
+                playerState = State.wallCling;
+                rbody.gravityScale = wallGravity;
+                animator.SetBool("Wallclinging", true);
+                rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * wallSpeedLoss);
+            }
+        }
         // ON GROUND
         else if (playerState == State.onGround)
         {
+            if (inputBufferTimer > 0)
+            {
+                Jump();
+            }
             // If Decelerating
             if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
             {
@@ -349,9 +312,59 @@ public class PlayerMovement : MonoBehaviour
                 accelValue = acceleration;
             }
             currentMaxSpeed = maxRunSpeed;
+            coyoteTimer = coyoteTimeLength;
+            canBlast = true;
+            //Air Transition
+            if(isGrounded() == false)
+            {
+                playerState = State.inAir;
+                animator.SetBool("Grounded", false);
+            }
+            //Cannot Transition To WallCling
+        }
+        // WALL CLING
+        else if (playerState == State.wallCling)
+        {
+            if (rbody.velocity.y < -2f)
+            {
+                rbody.velocity = new Vector2(rbody.velocity.x, -2f);
+            }
+            if (holdingForward)
+            {
+                wallStickTimer = wallStickTime;
+            }
+            if (inputBufferTimer > 0)
+            {
+                WallJump();
+            }
+            //InAir Transition - Jumped Off Located In WallJump()
+            //InAir Transition - Shot Located In Shooting()
+            //InAir Transition - Let Go
+            if(wallStickTimer <= 0)
+            {
+                playerState = State.inAir;
+                animator.SetBool("Wallclinging", false);
+                Flip();
+            }
+            //InAir Transition - Slid Off
+            if(rbody.velocity.y < wallThreshhold || !isOnWall())
+            {
+                playerState = State.inAir;
+                animator.SetBool("Wallclinging", false);
+                wallStickTimer = 0;
+                Flip();
+            }
+            //OnGround Transition
+            if(isGrounded())
+            {
+                wallStickTimer = 0;
+                playerState = State.onGround;
+                animator.SetBool("Wallclinging", false);
+                animator.SetBool("Grounded", true);
+            }
         }
 
-        // Horizontal Speed
+        // Horizontal Speed for inAir and onGround
         goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
         if (playerState != State.wallCling)
         {
@@ -413,6 +426,12 @@ public class PlayerMovement : MonoBehaviour
         // Long Jump Must Have Space Held Down (In case using Input Buffering)
         longJump = Input.GetKey(KeyCode.Space);
         fastFallModifier = 1;
+
+        //InAir Transition - Jumped Off
+        wallStickTimer = 0;
+        animator.SetBool("Wallclinging", false);
+        playerState = State.inAir;
+        Flip();
     }
 
     private Vector2 getVectorFromPlayerToMouse()

@@ -24030,13 +24030,15 @@ MonoBehaviour:
   fallingAccel: 3
   maxGravity: 6
   wallStickTime: 0.2
-  wallGravity: 0.4
+  wallGravity: 0.8
+  wallThreshhold: -1.5
+  wallSpeedLoss: 0.6
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 10
   bulletTimeLength: 1
   bulletTimeSlowdownFactor: 0.1
   bulletTimeIndicatorAnimator: {fileID: 1015675345}
-  canFire: 1
+  canBlast: 1
   blast: {fileID: 2114956205}
   coll: {fileID: 1382153657}
   groundLayer:
