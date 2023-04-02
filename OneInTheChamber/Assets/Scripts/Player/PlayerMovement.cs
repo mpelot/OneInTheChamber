@@ -162,6 +162,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
             canBlast = false;
+            bool ignore = false;
 
             if (playerState == State.wallCling)
             {
@@ -184,16 +185,21 @@ public class PlayerMovement : MonoBehaviour
                     float minY = 6f;
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
+                    animator.SetBool("Grounded", false);
                     animator.SetBool("Down Blast", true);
                 }
-                else
+                else if (playerState == State.inAir)
                 {
                     coyoteTimer = 0;
                     jumpCooldownTimer = coyoteTimeLength;
                     animator.SetBool("Up Blast", true);
                 }
+                else
+                {
+                    ignore = true;
+                }
             }
-            else //if (playerState == State.inAir)
+            else
             {
                 if (facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
                 {
@@ -205,14 +211,17 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
             
-            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
+            if (!ignore)
+            {
+                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
 
-            longJump = false;
+                longJump = false;
 
-            // Play particle effect
-            blast.transform.position = transform.position;
-            blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
-            blast.Play();
+                // Play particle effect
+                blast.transform.position = transform.position;
+                blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
+                blast.Play();
+            }
         }
 
         // Shooting
