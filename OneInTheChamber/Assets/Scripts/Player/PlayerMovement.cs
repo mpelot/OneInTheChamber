@@ -154,6 +154,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Blasting
+        animator.SetBool("Down Blast", false);
+        animator.SetBool("BW Blast", false);
+        animator.SetBool("FW Blast", false);
+
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
             canBlast = false;
@@ -179,8 +183,7 @@ public class PlayerMovement : MonoBehaviour
                     float minY = 6f;
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
-                    animator.SetTrigger("Down Blast");
-                    animator.SetBool("Grounded", false);
+                    animator.SetBool("Down Blast", true);
                 }
                 else
                 {
@@ -188,19 +191,18 @@ public class PlayerMovement : MonoBehaviour
                     jumpCooldownTimer = coyoteTimeLength;
                 }
             }
-            else if (playerState == State.inAir)
+            else //if (playerState == State.inAir)
             {
                 if (facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
                 {
-                    animator.SetTrigger("BW Blast");
+                    animator.SetBool("BW Blast", true);
                 } 
                 else
                 {
-                    animator.SetTrigger("FW Blast");
+                    animator.SetBool("FW Blast", true);
                 }
             }
             
-
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
 
             longJump = false;
