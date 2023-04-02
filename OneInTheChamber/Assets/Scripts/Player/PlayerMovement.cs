@@ -212,7 +212,9 @@ public class PlayerMovement : MonoBehaviour
 
             shooting = true;
             canBlast = false;
-            
+
+            animator.SetBool("Aiming", true);
+
             // Start bullet time timer
             bulletTimeTimer = bulletTimeLength;
             
@@ -223,12 +225,20 @@ public class PlayerMovement : MonoBehaviour
         }
         if (shooting) {
             Vector2 laserDirection = getVectorFromPlayerToMouse();
+            animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
+            if (!facingRight)
+                Flip();
+            transform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
             laserGuide.setLaserDirection(laserDirection);
             laserGuide.showLaser();
         }
         if (bulletTimeTimer < 0)
         {
             shooting = false;
+            animator.SetBool("Aiming", false);
+
+            transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
+
             Vector2 laserDirection = getVectorFromPlayerToMouse();
 
             GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
