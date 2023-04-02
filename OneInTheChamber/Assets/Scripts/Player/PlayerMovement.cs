@@ -158,9 +158,12 @@ public class PlayerMovement : MonoBehaviour
         {
             canBlast = false;
 
-            playerState = State.inAir;
-            animator.SetBool("Wallclinging", false);
-            wallStickTimer = 0;
+            if (playerState == State.wallCling)
+            {
+                playerState = State.inAir;
+                animator.SetBool("Wallclinging", false);
+                wallStickTimer = 0;
+            }
 
             Vector2 blastDirection = getVectorFromPlayerToMouse();
 
@@ -288,7 +291,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("Grounded", true);
             }
             //WallCling Transition
-            if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
+            else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
                 rbody.gravityScale = wallGravity;
@@ -353,7 +356,7 @@ public class PlayerMovement : MonoBehaviour
                 Flip();
             }
             //InAir Transition - Slid Off
-            if(rbody.velocity.y < wallThreshhold || !isOnWall())
+            else if(rbody.velocity.y < wallThreshhold || !isOnWall())
             {
                 playerState = State.inAir;
                 animator.SetBool("Wallclinging", false);
@@ -361,7 +364,7 @@ public class PlayerMovement : MonoBehaviour
                 Flip();
             }
             //OnGround Transition
-            if(isGrounded())
+            else if(isGrounded())
             {
                 wallStickTimer = 0;
                 playerState = State.onGround;
