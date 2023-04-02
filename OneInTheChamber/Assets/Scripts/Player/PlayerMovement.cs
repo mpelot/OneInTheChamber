@@ -188,10 +188,18 @@ public class PlayerMovement : MonoBehaviour
                     jumpCooldownTimer = coyoteTimeLength;
                 }
             }
-            else if (playerState == State.inAir && facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
+            else if (playerState == State.inAir)
             {
-                animator.SetTrigger("BW Blast");
+                if (facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
+                {
+                    animator.SetTrigger("BW Blast");
+                } 
+                else
+                {
+                    animator.SetTrigger("FW Blast");
+                }
             }
+            
 
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
 
