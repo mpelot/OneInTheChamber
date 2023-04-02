@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     public float acceleration;
     public float maxRunSpeed;
-    public float trueMaxSpeed;
+    public Vector2 trueMaxSpeed;
     public enum State { inAir, onGround, wallCling };
     public State playerState = State.inAir;
 
@@ -193,7 +193,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetTrigger("BW Blast");
             }
 
-            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed, trueMaxSpeed), Mathf.Clamp(newVelocity.y, -trueMaxSpeed, trueMaxSpeed));
+            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
 
             longJump = false;
 
