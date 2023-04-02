@@ -155,6 +155,7 @@ public class PlayerMovement : MonoBehaviour
 
         // Blasting
         animator.SetBool("Down Blast", false);
+        animator.SetBool("Up Blast", false);
         animator.SetBool("BW Blast", false);
         animator.SetBool("FW Blast", false);
 
@@ -189,6 +190,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     coyoteTimer = 0;
                     jumpCooldownTimer = coyoteTimeLength;
+                    animator.SetBool("Up Blast", true);
                 }
             }
             else //if (playerState == State.inAir)
@@ -209,7 +211,7 @@ public class PlayerMovement : MonoBehaviour
 
             // Play particle effect
             blast.transform.position = transform.position;
-            blast.transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.right, blastDirection) + 10, Vector3.back);
+            blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
             blast.Play();
         }
 
