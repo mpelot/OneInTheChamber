@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpikeLogic : MonoBehaviour
 {
@@ -12,7 +13,8 @@ public class SpikeLogic : MonoBehaviour
 	{
 		if (collision.gameObject.tag == "Player") {
 			// TODO: cause damage
-			collision.gameObject.transform.position += Vector3.up * 1.5f;
+			//collision.gameObject.transform.position += Vector3.up * 1.5f;
+			SceneManager.LoadScene("Testing");
 		}
 	}
 }
