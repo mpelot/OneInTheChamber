@@ -14,7 +14,7 @@ public class SpikeLogic : MonoBehaviour
 		if (collision.gameObject.tag == "Player") {
 			// TODO: cause damage
 			//collision.gameObject.transform.position += Vector3.up * 1.5f;
-			SceneManager.LoadScene("Testing");
+			SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		}
 	}
 }

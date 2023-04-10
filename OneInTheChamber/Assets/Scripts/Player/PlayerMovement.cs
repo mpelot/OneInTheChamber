@@ -278,7 +278,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             // Reload Scene
-            SceneManager.LoadScene("Testing");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 
