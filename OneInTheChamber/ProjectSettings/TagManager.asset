@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Wall
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -50,4 +51,7 @@ TagManager:
     locked: 0
   - name: Ground
     uniqueID: 2678218817
+    locked: 0
+  - name: Cursor
+    uniqueID: 1725115929
     locked: 0
