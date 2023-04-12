@@ -118,7 +118,7 @@ MonoBehaviour:
   maxGravity: 6
   wallStickTime: 0.2
   wallGravity: 0.8
-  wallThreshhold: -3.5
+  wallThreshhold: -5
   wallSpeedLoss: 0.6
   wallSpeedDecay: 3
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
@@ -388,7 +388,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.69411767, g: 0.8901961, b: 1, a: 1}
+  m_Color: {r: 0.49019608, g: 0.6431373, b: 0.74509805, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
