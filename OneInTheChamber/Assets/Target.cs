@@ -18,12 +18,14 @@ public class Target : MonoBehaviour
 
     private void OnBecameVisible()
     {
-        tg.GetComponentInChildren<SpriteRenderer>().enabled = false;
+        if (tg != null)
+            tg.GetComponentInChildren<SpriteRenderer>().enabled = false;
     }
 
     private void OnBecameInvisible()
     {
-        tg.GetComponentInChildren<SpriteRenderer>().enabled = true;
+        if (tg != null)
+            tg.GetComponentInChildren<SpriteRenderer>().enabled = true;
     }
 
     public void Shatter()
