@@ -315,7 +315,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
             //OnGround Transtion
-            if(isGrounded() && rbody.velocity.y <= 0)
+            if(isGrounded())
             {
                 playerState = State.onGround;
                 rbody.gravityScale = defaultGravity;

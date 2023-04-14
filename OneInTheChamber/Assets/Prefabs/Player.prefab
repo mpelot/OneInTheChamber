@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acceleration: 12
   maxRunSpeed: 5
-  trueMaxSpeed: {x: 12, y: 10}
+  trueMaxSpeed: {x: 20, y: 10}
   playerState: 0
   jumpForce: 7
   coyoteTimeLength: 0.06
@@ -122,7 +122,7 @@ MonoBehaviour:
   wallSpeedLoss: 0.6
   wallSpeedDecay: 3
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
-  bulletForce: 10
+  bulletForce: 8
   bulletTimeLength: 1
   bulletTimeSlowdownFactor: 0.1
   bulletTimeIndicatorAnimator: {fileID: 2861250681970622655}
