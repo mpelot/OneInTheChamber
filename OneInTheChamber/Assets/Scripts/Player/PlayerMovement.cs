@@ -221,6 +221,8 @@ public class PlayerMovement : MonoBehaviour
                 blast.transform.position = transform.position;
                 blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
                 blast.Play();
+                GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+                newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
             }
         }
 
@@ -264,6 +266,9 @@ public class PlayerMovement : MonoBehaviour
 
             GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
             newBullet.GetComponent<BulletPhysics>().movAngle = laserDirection;
+
+            Vector2 newVelocity = rbody.velocity + (-laserDirection.normalized * bulletForce);
+            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
 
             laserGuide.hideLaser();
             bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
