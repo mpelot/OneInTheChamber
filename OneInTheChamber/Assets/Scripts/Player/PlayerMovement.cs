@@ -29,7 +29,6 @@ public class PlayerMovement : MonoBehaviour
     public float wallThreshhold;
     public float wallSpeedLoss;
     public float wallSpeedDecay;
-    public float wallJumpPauseVelocityScale;        // How much to scale the pause duration by the velocity when colliding with a wall
 
     //Firing
     [Header("Firing")]
@@ -68,7 +67,6 @@ public class PlayerMovement : MonoBehaviour
     private bool shooting = false;
     private Camera mainCam;
     public float lastSpeed;
-    private float freezeAmount = 0f;
 
     void Start()
     {
@@ -299,12 +297,6 @@ public class PlayerMovement : MonoBehaviour
             // Reload Scene
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-
-        if (freezeAmount > 0)
-        {
-            StartCoroutine(Freeze(freezeAmount));
-            freezeAmount = 0f;
-        }
     }
 
     void FixedUpdate()
@@ -391,13 +383,6 @@ public class PlayerMovement : MonoBehaviour
             //WallCling Transition
             else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
-                float freezeTime = Mathf.Clamp(Mathf.Abs(lastSpeed) * wallJumpPauseVelocityScale, 0f, 0.25f);
-                if (freezeTime <= 0.10)
-                {
-                    freezeTime = 0;
-                }
-                freezeAmount = freezeTime;
-
                 playerState = State.wallCling;
                 rbody.gravityScale = wallGravity;
                 animator.SetBool("Wallclinging", true);
@@ -571,13 +556,5 @@ public class PlayerMovement : MonoBehaviour
         norm.z = 0;
 
         return (Vector2)(norm - transform.position).normalized;
-    }
-
-    private IEnumerator Freeze(float duration)
-    {
-        float timeScale = Time.timeScale;
-        Time.timeScale = 0;
-        yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = timeScale;
     }
 }
