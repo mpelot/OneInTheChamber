@@ -49,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rbody;
     private Animator animator;
+    public Animator ssAnimator;
     public bool facingRight = true;
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
@@ -69,6 +70,8 @@ public class PlayerMovement : MonoBehaviour
     {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        //ssAnimator = GetComponentInChildren<Animator>();
+
         laserGuide = GetComponent<LaserGuide>();
         accelValue = acceleration;
         mainCam = Camera.main;
@@ -102,6 +105,8 @@ public class PlayerMovement : MonoBehaviour
         
         // Calulate if the player is holding in the direction they are facing
         holdingForward = facingRight ? goalSpeed.x > 0 : goalSpeed.x < 0;
+
+        ssAnimator.SetBool("Stretch", false);
 
         // Player States Input-Based Calculations
         // IN AIR
@@ -159,6 +164,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Up Blast", false);
         animator.SetBool("BW Blast", false);
         animator.SetBool("FW Blast", false);
+        ssAnimator.SetBool("Squash", false);
 
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
@@ -188,12 +194,14 @@ public class PlayerMovement : MonoBehaviour
                         newVelocity = new Vector2(rbody.velocity.x, minY);
                     animator.SetBool("Grounded", false);
                     animator.SetBool("Down Blast", true);
+                    ssAnimator.SetBool("Stretch", true);
                 }
                 else if (playerState == State.inAir)
                 {
                     coyoteTimer = 0;
                     jumpCooldownTimer = coyoteTimeLength;
                     animator.SetBool("Up Blast", true);
+                    ssAnimator.SetBool("Stretch", true);
                 }
                 else
                 {
@@ -210,6 +218,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     animator.SetBool("FW Blast", true);
                 }
+                ssAnimator.SetBool("Squash", true);
             }
             
             if (!ignore)
@@ -294,6 +303,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        ssAnimator.SetBool("Land", false);
         // Player States
         // IN AIR
         if (playerState == State.inAir)
@@ -330,6 +340,7 @@ public class PlayerMovement : MonoBehaviour
                 playerState = State.onGround;
                 rbody.gravityScale = defaultGravity;
                 animator.SetBool("Grounded", true);
+                ssAnimator.SetBool("Land", true);
             }
             //WallCling Transition
             else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
@@ -463,6 +474,7 @@ public class PlayerMovement : MonoBehaviour
         // Long Jump Must Have Space Held Down (In case using Input Buffering)
         longJump = Input.GetKey(KeyCode.Space);
         fastFallModifier = 1;
+        ssAnimator.SetBool("Stretch", true);
     }
 
     private void WallJump()
