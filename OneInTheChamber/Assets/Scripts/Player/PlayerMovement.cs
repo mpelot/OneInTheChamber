@@ -41,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     LaserGuide laserGuide;
     //public ParticleSystem blast;
     public GameObject blast;
+    public Transform spriteTransform;
 
     // Ground Detection
     [Header("Ground Detection")]
@@ -233,7 +234,7 @@ public class PlayerMovement : MonoBehaviour
                 //blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
                 //blast.Play();
 
-                GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+                GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
                 newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
             }
         }
@@ -263,7 +264,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
             if (!facingRight)
                 Flip();
-            transform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
+            spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
             laserGuide.setLaserDirection(laserDirection);
             laserGuide.showLaser();
         }
@@ -272,11 +273,11 @@ public class PlayerMovement : MonoBehaviour
             shooting = false;
             animator.SetBool("Aiming", false);
 
-            transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
+            spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
 
             Vector2 laserDirection = getVectorFromPlayerToMouse();
 
-            GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
             newBullet.GetComponent<BulletPhysics>().movAngle = laserDirection;
 
             Vector2 newVelocity = rbody.velocity + (-laserDirection.normalized * bulletForce);
@@ -333,12 +334,12 @@ public class PlayerMovement : MonoBehaviour
             }
 
             // Check for partial ceilings and correct position
-            if (rbody.velocity.y > 1f)
+            if (rbody.velocity.y > 1f && !isOnWall())
             {
-                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20833f, transform.position.y + .4f), Vector2.up, .1f);
+                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20834f, transform.position.y + .4f), Vector2.up, .1f);
                 bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f);
                 bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f);
-                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20833f, transform.position.y + .4f), Vector2.up, .1f);
+                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20834f, transform.position.y + .4f), Vector2.up, .1f);
                 if (ll && !l && !rr)
                     transform.position = new Vector3(transform.position.x + .13f, transform.position.y, 0f);
                 if (rr && !r && !ll)

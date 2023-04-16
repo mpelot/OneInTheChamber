@@ -160,6 +160,7 @@ MonoBehaviour:
   bulletTimeIndicatorAnimator: {fileID: 2861250681970622655}
   canBlast: 1
   blast: {fileID: 934485827783583829, guid: 8d965d08dd72f6d499f6400d31d05ffd, type: 3}
+  spriteTransform: {fileID: 1157575191562551380}
   coll: {fileID: 2861250680605902039}
   groundLayer:
     serializedVersion: 2
