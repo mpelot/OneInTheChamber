@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rbody;
     private Animator animator;
-    private Animator ssAnimator;
+    public Animator ssAnimator;
     public bool facingRight = true;
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
@@ -70,7 +70,6 @@ public class PlayerMovement : MonoBehaviour
     {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        ssAnimator = GetComponentInChildren<Animator>();
 
         laserGuide = GetComponent<LaserGuide>();
         accelValue = acceleration;
