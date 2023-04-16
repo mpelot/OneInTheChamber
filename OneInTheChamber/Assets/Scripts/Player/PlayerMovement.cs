@@ -165,8 +165,6 @@ public class PlayerMovement : MonoBehaviour
             canBlast = false;
             bool ignore = false;
 
-            Instantiate(blast, transform.position, Quaternion.identity);
-
             if (playerState == State.wallCling)
             {
                 playerState = State.inAir;
@@ -219,6 +217,9 @@ public class PlayerMovement : MonoBehaviour
                 rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
 
                 longJump = false;
+
+                Vector3 blastPos = new Vector3(transform.position.x + blastDirection.x * .5f, transform.position.y + blastDirection.y * .5f, 0);
+                Instantiate(blast, blastPos, Quaternion.identity);
 
                 // Play particle effect
                 //blast.transform.position = transform.position;
