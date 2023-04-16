@@ -39,7 +39,8 @@ public class PlayerMovement : MonoBehaviour
     public Animator bulletTimeIndicatorAnimator;
     public bool canBlast = true;
     LaserGuide laserGuide;
-    public ParticleSystem blast;
+    //public ParticleSystem blast;
+    public GameObject blast;
 
     // Ground Detection
     [Header("Ground Detection")]
@@ -106,7 +107,6 @@ public class PlayerMovement : MonoBehaviour
         // IN AIR
         if (playerState == State.inAir)
         {
-
             // If Jumping
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -134,7 +134,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 longJump = false;
             }
-
         }
         // ON GROUND
         else if (playerState == State.onGround)
@@ -162,7 +161,6 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
             canBlast = false;
-            bool ignore = false;
 
             if (playerState == State.wallCling)
             {
@@ -177,6 +175,15 @@ public class PlayerMovement : MonoBehaviour
             blastDirection = Mathf.Abs(blastDirection.x) > Mathf.Abs(blastDirection.y) ? Vector2.right * Mathf.Sign(blastDirection.x) : Vector2.up * Mathf.Sign(blastDirection.y);
 
             Vector2 newVelocity = rbody.velocity + (-blastDirection * bulletForce);
+
+            // Play particle effect
+            /*
+            blast.transform.position = transform.position;
+            blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
+            blast.Play();
+            */
+            Instantiate(blast, transform.position, Quaternion.identity);
+
             if (blastDirection.x == 0)
             {
                 if (blastDirection.y < 0)
@@ -194,10 +201,6 @@ public class PlayerMovement : MonoBehaviour
                     jumpCooldownTimer = coyoteTimeLength;
                     animator.SetBool("Up Blast", true);
                 }
-                else
-                {
-                    ignore = true;
-                }
             }
             else
             {
@@ -210,18 +213,8 @@ public class PlayerMovement : MonoBehaviour
                     animator.SetBool("FW Blast", true);
                 }
             }
-            
-            if (!ignore)
-            {
-                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
-
-                longJump = false;
-
-                // Play particle effect
-                blast.transform.position = transform.position;
-                blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
-                blast.Play();
-            }
+            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
+            longJump = false;
         }
 
         // Shooting
