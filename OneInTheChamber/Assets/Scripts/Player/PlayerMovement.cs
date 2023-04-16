@@ -40,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     public bool canBlast = true;
     LaserGuide laserGuide;
     public ParticleSystem blastTrail;
+    public ParticleSystem jumpDust;
     public GameObject blast;
     public Transform spriteTransform;
 
@@ -305,7 +306,6 @@ public class PlayerMovement : MonoBehaviour
         // IN AIR
         if (playerState == State.inAir)
         {
-
             // Restrict Horizontal Movement In Air
             accelValue = .7f * acceleration;
 
@@ -345,9 +345,9 @@ public class PlayerMovement : MonoBehaviour
             }
 
             // Check for partial walls and correct position
-            if (Mathf.Abs(rbody.velocity.x) > 0f && rbody.velocity.y < 2f)
+            Vector2 dir = facingRight ? Vector2.right : Vector2.left;
+            if (rbody.velocity.x * dir.x > 0f && rbody.velocity.y < 2f)
             {
-                Vector2 dir = facingRight ? Vector2.right : Vector2.left;
                 bool u = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .25f), dir, .1f, groundLayer);
                 bool d = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .499f), dir, .1f, groundLayer);
                 if (d && !u)
@@ -365,10 +365,17 @@ public class PlayerMovement : MonoBehaviour
             //OnGround Transtion
             if (isGrounded())
             {
-                playerState = State.onGround;
-                rbody.gravityScale = defaultGravity;
-                animator.SetBool("Grounded", true);
-                ssAnimator.SetBool("Land", true);
+                if (inputBufferTimer > 0)
+                {
+                    Jump();
+                }
+                else
+                {
+                    playerState = State.onGround;
+                    rbody.gravityScale = defaultGravity;
+                    animator.SetBool("Grounded", true);
+                    ssAnimator.SetBool("Land", true);
+                }
             }
             //WallCling Transition
             else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
@@ -386,10 +393,6 @@ public class PlayerMovement : MonoBehaviour
         // ON GROUND
         else if (playerState == State.onGround)
         {
-            if (inputBufferTimer > 0)
-            {
-                Jump();
-            }
             // If Decelerating
             if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
             {
@@ -503,6 +506,7 @@ public class PlayerMovement : MonoBehaviour
         longJump = Input.GetKey(KeyCode.Space);
         fastFallModifier = 1;
         ssAnimator.SetBool("Stretch", true);
+        jumpDust.Play();
     }
 
     private void WallJump()
