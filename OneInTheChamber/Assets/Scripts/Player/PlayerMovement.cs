@@ -39,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
     public Animator bulletTimeIndicatorAnimator;
     public bool canBlast = true;
     LaserGuide laserGuide;
-    //public ParticleSystem blast;
+    public ParticleSystem blastTrail;
     public GameObject blast;
     public Transform spriteTransform;
 
@@ -230,12 +230,10 @@ public class PlayerMovement : MonoBehaviour
                 Instantiate(blast, blastPos, Quaternion.identity);
 
                 // Play particle effect
-                //blast.transform.position = transform.position;
-                //blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
-                //blast.Play();
+                blastTrail.Play();
 
-                GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
-                newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
+                //GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
+                //newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
             }
         }
 
