@@ -365,6 +365,7 @@ public class PlayerMovement : MonoBehaviour
             //OnGround Transtion
             if (isGrounded())
             {
+                canBlast = true;
                 if (inputBufferTimer > 0)
                 {
                     Jump();
