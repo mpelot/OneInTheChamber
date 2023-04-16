@@ -37103,10 +37103,6 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2861250680605902043, guid: 0e128dc1ddba5024088d5d39e67fdffe, type: 3}
-      propertyPath: wallJumpPauseVelocityScale
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2861250680605902043, guid: 0e128dc1ddba5024088d5d39e67fdffe, type: 3}
       propertyPath: wallJumpPauseRepeatDuration
       value: 1
       objectReference: {fileID: 0}

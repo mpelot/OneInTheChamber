@@ -154,8 +154,9 @@ MonoBehaviour:
   wallThreshhold: -5
   wallSpeedLoss: 0.6
   wallSpeedDecay: 3
-  wallJumpPauseVelocityScale: 0.1
-  wallJumpPauseRepeatScale: 0.1
+  wallJumpPauseVelocityScale: 0.01
+  maxFreezeDuration: 0.35
+  minFreezeDuration: 0.1
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 8
   bulletTimeLength: 1
