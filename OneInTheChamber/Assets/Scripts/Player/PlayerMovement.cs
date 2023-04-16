@@ -39,7 +39,8 @@ public class PlayerMovement : MonoBehaviour
     public Animator bulletTimeIndicatorAnimator;
     public bool canBlast = true;
     LaserGuide laserGuide;
-    public ParticleSystem blast;
+    //public ParticleSystem blast;
+    public GameObject blast;
 
     // Ground Detection
     [Header("Ground Detection")]
@@ -164,6 +165,8 @@ public class PlayerMovement : MonoBehaviour
             canBlast = false;
             bool ignore = false;
 
+            Instantiate(blast, transform.position, Quaternion.identity);
+
             if (playerState == State.wallCling)
             {
                 playerState = State.inAir;
@@ -218,9 +221,10 @@ public class PlayerMovement : MonoBehaviour
                 longJump = false;
 
                 // Play particle effect
-                blast.transform.position = transform.position;
-                blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
-                blast.Play();
+                //blast.transform.position = transform.position;
+                //blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
+                //blast.Play();
+
                 GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
                 newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
             }
