@@ -70,7 +70,6 @@ public class PlayerMovement : MonoBehaviour
     {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-
         laserGuide = GetComponent<LaserGuide>();
         accelValue = acceleration;
         mainCam = Camera.main;
@@ -333,8 +332,39 @@ public class PlayerMovement : MonoBehaviour
                 rbody.gravityScale = longJumpGravity;
             }
 
+            // Check for partial ceilings and correct position
+            if (rbody.velocity.y > 1f)
+            {
+                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20833f, transform.position.y + .4f), Vector2.up, .1f);
+                bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f);
+                bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f);
+                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20833f, transform.position.y + .4f), Vector2.up, .1f);
+                if (ll && !l && !rr)
+                    transform.position = new Vector3(transform.position.x + .13f, transform.position.y, 0f);
+                if (rr && !r && !ll)
+                    transform.position = new Vector3(transform.position.x - .13f, transform.position.y, 0f);
+            }
+
+            // Check for partial walls and correct position
+            if (Mathf.Abs(rbody.velocity.x) > 0f && rbody.velocity.y < 2f)
+            {
+                Vector2 dir = facingRight ? Vector2.right : Vector2.left;
+                bool u = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .25f), dir, .1f, groundLayer);
+                bool d = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .499f), dir, .1f, groundLayer);
+                if (d && !u)
+                {
+                    RaycastHit2D[] floor = new RaycastHit2D[1];
+                    ContactFilter2D filter = new ContactFilter2D();
+                    filter.layerMask = groundLayer;
+                    Physics2D.Raycast(new Vector2(transform.position.x + .5f * dir.x, transform.position.y - .25f), Vector2.down, filter, floor);
+                    animator.SetBool("Grounded", true);
+                    transform.position = new Vector3(transform.position.x + .1f * dir.x, transform.position.y + .28f - floor[0].distance, 0f);
+                    rbody.velocity = new Vector2(rbody.velocity.x, 0f);
+                }
+            }
+
             //OnGround Transtion
-            if(isGrounded())
+            if (isGrounded())
             {
                 playerState = State.onGround;
                 rbody.gravityScale = defaultGravity;
@@ -454,7 +484,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnWall()
     {
         Vector2 dir = facingRight ? Vector2.right : Vector2.left;
-        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .3f) , 0f, dir, .02f, groundLayer);
+        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .5f) , 0f, dir, .02f, groundLayer);
     }
 
     private void Flip()
