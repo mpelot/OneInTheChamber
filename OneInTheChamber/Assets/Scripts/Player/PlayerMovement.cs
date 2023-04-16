@@ -40,7 +40,8 @@ public class PlayerMovement : MonoBehaviour
     public Animator bulletTimeIndicatorAnimator;
     public bool canBlast = true;
     LaserGuide laserGuide;
-    //public ParticleSystem blast;
+    public ParticleSystem blastTrail;
+    public ParticleSystem jumpDust;
     public GameObject blast;
     public Transform spriteTransform;
 
@@ -232,12 +233,10 @@ public class PlayerMovement : MonoBehaviour
                 Instantiate(blast, blastPos, Quaternion.identity);
 
                 // Play particle effect
-                //blast.transform.position = transform.position;
-                //blast.transform.rotation = Quaternion.LookRotation(Vector3.forward, blastDirection) * Quaternion.Euler(0, 0, 80);
-                //blast.Play();
+                blastTrail.Play();
 
-                GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
-                newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
+                //GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
+                //newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
             }
         }
 
@@ -315,7 +314,6 @@ public class PlayerMovement : MonoBehaviour
         // IN AIR
         if (playerState == State.inAir)
         {
-
             // Restrict Horizontal Movement In Air
             accelValue = .7f * acceleration;
 
@@ -355,9 +353,9 @@ public class PlayerMovement : MonoBehaviour
             }
 
             // Check for partial walls and correct position
-            if (Mathf.Abs(rbody.velocity.x) > 0f && rbody.velocity.y < 2f)
+            Vector2 dir = facingRight ? Vector2.right : Vector2.left;
+            if (rbody.velocity.x * dir.x > 0f && rbody.velocity.y < 2f)
             {
-                Vector2 dir = facingRight ? Vector2.right : Vector2.left;
                 bool u = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .25f), dir, .1f, groundLayer);
                 bool d = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .499f), dir, .1f, groundLayer);
                 if (d && !u)
@@ -366,19 +364,29 @@ public class PlayerMovement : MonoBehaviour
                     ContactFilter2D filter = new ContactFilter2D();
                     filter.layerMask = groundLayer;
                     Physics2D.Raycast(new Vector2(transform.position.x + .5f * dir.x, transform.position.y - .25f), Vector2.down, filter, floor);
-                    animator.SetBool("Grounded", true);
+                    if (inputBufferTimer <= 0)
+                        animator.SetBool("Grounded", true);
                     transform.position = new Vector3(transform.position.x + .1f * dir.x, transform.position.y + .28f - floor[0].distance, 0f);
                     rbody.velocity = new Vector2(rbody.velocity.x, 0f);
+                    
                 }
             }
 
             //OnGround Transtion
             if (isGrounded())
             {
-                playerState = State.onGround;
-                rbody.gravityScale = defaultGravity;
-                animator.SetBool("Grounded", true);
-                ssAnimator.SetBool("Land", true);
+                canBlast = true;
+                if (inputBufferTimer > 0)
+                {
+                    Jump();
+                }
+                else
+                {
+                    playerState = State.onGround;
+                    rbody.gravityScale = defaultGravity;
+                    animator.SetBool("Grounded", true);
+                    ssAnimator.SetBool("Land", true);
+                }
             }
             //WallCling Transition
             else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
@@ -403,10 +411,6 @@ public class PlayerMovement : MonoBehaviour
         // ON GROUND
         else if (playerState == State.onGround)
         {
-            if (inputBufferTimer > 0)
-            {
-                Jump();
-            }
             // If Decelerating
             if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
             {
@@ -519,7 +523,9 @@ public class PlayerMovement : MonoBehaviour
         // Long Jump Must Have Space Held Down (In case using Input Buffering)
         longJump = Input.GetKey(KeyCode.Space);
         fastFallModifier = 1;
+        animator.SetBool("Grounded", false);   // Just trust me bro
         ssAnimator.SetBool("Stretch", true);
+        jumpDust.Play();
     }
 
     private void WallJump()
