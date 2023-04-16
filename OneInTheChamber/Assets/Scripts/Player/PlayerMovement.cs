@@ -30,8 +30,6 @@ public class PlayerMovement : MonoBehaviour
     public float wallSpeedLoss;
     public float wallSpeedDecay;
     public float wallJumpPauseVelocityScale;        // How much to scale the pause duration by the velocity when colliding with a wall
-    public float maxFreezeDuration;
-    public float minFreezeDuration;
 
     //Firing
     [Header("Firing")]
@@ -393,8 +391,8 @@ public class PlayerMovement : MonoBehaviour
             //WallCling Transition
             else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
-                float freezeTime = Mathf.Clamp(Mathf.Abs(lastSpeed) * wallJumpPauseVelocityScale, 0f, maxFreezeDuration);
-                if (freezeTime <= minFreezeDuration)
+                float freezeTime = Mathf.Clamp(Mathf.Abs(lastSpeed) * wallJumpPauseVelocityScale, 0f, 0.25f);
+                if (freezeTime <= 0.10)
                 {
                     freezeTime = 0;
                 }
