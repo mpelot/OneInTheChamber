@@ -356,9 +356,11 @@ public class PlayerMovement : MonoBehaviour
                     ContactFilter2D filter = new ContactFilter2D();
                     filter.layerMask = groundLayer;
                     Physics2D.Raycast(new Vector2(transform.position.x + .5f * dir.x, transform.position.y - .25f), Vector2.down, filter, floor);
-                    animator.SetBool("Grounded", true);
+                    if (inputBufferTimer <= 0)
+                        animator.SetBool("Grounded", true);
                     transform.position = new Vector3(transform.position.x + .1f * dir.x, transform.position.y + .28f - floor[0].distance, 0f);
                     rbody.velocity = new Vector2(rbody.velocity.x, 0f);
+                    
                 }
             }
 
@@ -506,6 +508,7 @@ public class PlayerMovement : MonoBehaviour
         // Long Jump Must Have Space Held Down (In case using Input Buffering)
         longJump = Input.GetKey(KeyCode.Space);
         fastFallModifier = 1;
+        animator.SetBool("Grounded", false);   // Just trust me bro
         ssAnimator.SetBool("Stretch", true);
         jumpDust.Play();
     }
