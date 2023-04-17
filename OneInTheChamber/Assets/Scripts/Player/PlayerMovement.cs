@@ -434,11 +434,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 accelValue = acceleration;
             }
-            // Sliding
-            if (Mathf.Abs(rbody.velocity.x) > Mathf.Abs(goalSpeed.x))
-                slideDust.Play();
-            else
-                slideDust.Stop();
             currentMaxSpeed = maxRunSpeed;
             coyoteTimer = coyoteTimeLength;
             canBlast = true;
