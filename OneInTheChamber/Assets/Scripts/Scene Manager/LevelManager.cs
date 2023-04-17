@@ -7,12 +7,14 @@ using TMPro;
 public class LevelManager : MonoBehaviour
 {
     public float timer;
-    public Scene nextScene;
-    public TextMeshProUGUI timerText;
+    public string nextScene;
+    private TextMeshProUGUI timerText;
     // Start is called before the first frame update
     void Start()
     {
+        timerText = GetComponentInChildren<TextMeshProUGUI>();
         timerText.text = ((int)timer).ToString("D2") + ":" + ((int)(timer % 1 * 100)).ToString("D2");
+        Time.timeScale = 1f;
     }
 
     private void Update()
@@ -32,6 +34,6 @@ public class LevelManager : MonoBehaviour
 
     public void Win()
     {
-        SceneManager.LoadScene(nextScene.name, LoadSceneMode.Single);
+        SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
     }
 }
