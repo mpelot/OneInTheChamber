@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public float wallThreshhold;
     public float wallSpeedLoss;
     public float wallSpeedDecay;
+    public float wallSplatTime;
 
     //Firing
     [Header("Firing")]
@@ -56,6 +57,7 @@ public class PlayerMovement : MonoBehaviour
     private float coyoteTimer = 0;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
+    private float wallSplatTimer = 0;
     private float wallStickTimer = 0;
     private bool holdingForward = false;
     private float bulletTimeTimer = 0;
@@ -170,12 +172,16 @@ public class PlayerMovement : MonoBehaviour
         {
             canBlast = false;
             bool ignore = false;
+            rbody.gravityScale = defaultGravity;
 
             if (playerState == State.wallCling)
             {
                 playerState = State.inAir;
                 animator.SetBool("Wallclinging", false);
                 wallStickTimer = 0;
+                wallSplatTimer = 0;
+                lastSpeed = 0;
+                Flip();
             }
 
             Vector2 blastDirection = getVectorFromPlayerToMouse();
@@ -188,7 +194,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (blastDirection.y < 0)
                 {
-                    // Minimun y velocity after a downwards blast
+                    // Minimum y velocity after a downwards blast
                     float minY = 6f;
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
@@ -302,6 +308,8 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         ssAnimator.SetBool("Land", false);
+        ssAnimator.SetBool("WallSplat", false);
+        ssAnimator.SetBool("Neutral", false);
         // Player States
         // IN AIR
         if (playerState == State.inAir)
@@ -384,9 +392,18 @@ public class PlayerMovement : MonoBehaviour
             else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
-                rbody.gravityScale = wallGravity;
                 animator.SetBool("Wallclinging", true);
-                rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * wallSpeedLoss);
+                if (Mathf.Abs(lastSpeed) > maxRunSpeed)
+                {
+                    ssAnimator.SetBool("WallSplat", true);
+                    wallSplatTimer = wallSplatTime;
+                    rbody.gravityScale = 0f;
+                    rbody.velocity = Vector2.zero;
+                } else
+                {
+                    rbody.gravityScale = wallGravity;
+                    rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * wallSpeedLoss);
+                }  
             }
             else if(!isOnWall())
             {
@@ -409,8 +426,9 @@ public class PlayerMovement : MonoBehaviour
             currentMaxSpeed = maxRunSpeed;
             coyoteTimer = coyoteTimeLength;
             canBlast = true;
+            lastSpeed = rbody.velocity.x;
             //Air Transition
-            if(isGrounded() == false)
+            if (isGrounded() == false)
             {
                 playerState = State.inAir;
                 animator.SetBool("Grounded", false);
@@ -422,7 +440,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if(Mathf.Abs(lastSpeed) > 0)
             {
-                lastSpeed -= Mathf.Sign(lastSpeed) * wallSpeedDecay * Time.fixedDeltaTime;
+                //lastSpeed -= Mathf.Sign(lastSpeed) * wallSpeedDecay * Time.fixedDeltaTime;
             } 
             if (holdingForward)
             {
@@ -432,13 +450,16 @@ public class PlayerMovement : MonoBehaviour
             {
                 WallJump();
             }
+            if (wallSplatTimer <= 0)
+                rbody.gravityScale = wallGravity;
             //InAir Transition - Jumped Off Located In WallJump()
             //InAir Transition - Shot Located In Shooting()
             //InAir Transition - Let Go
-            if(wallStickTimer <= 0)
+            if (wallStickTimer <= 0)
             {
                 playerState = State.inAir;
                 animator.SetBool("Wallclinging", false);
+                ssAnimator.SetBool("Neutral", true);
                 Flip();
             }
             //InAir Transition - Slid Off
@@ -446,6 +467,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 playerState = State.inAir;
                 animator.SetBool("Wallclinging", false);
+                ssAnimator.SetBool("Neutral", true);
                 wallStickTimer = 0;
                 Flip();
             }
@@ -478,6 +500,8 @@ public class PlayerMovement : MonoBehaviour
             jumpCooldownTimer -= Time.fixedDeltaTime;
         if (wallStickTimer > 0)
             wallStickTimer -= Time.fixedDeltaTime;
+        if (wallSplatTimer > 0)
+            wallSplatTimer -= Time.fixedDeltaTime;
         if (bulletTimeTimer > 0)
             bulletTimeTimer -= Time.fixedUnscaledDeltaTime;  // Time has to be unscaled here or it will be affected by the slowdown
     }
@@ -515,19 +539,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void WallJump()
     {
-        float magnitude = 0;
-        if (Mathf.Abs(lastSpeed) > maxRunSpeed)
-        {
-            magnitude = -lastSpeed;
-        }
-        else if (transform.localScale.x == -1)
-        {
-            magnitude = maxRunSpeed;
-        }
-        else
-        {
-            magnitude = -maxRunSpeed;
-        }
+        // If still splatting on wall, perform a super wall jump, otherwise perform a regular one
+        float magnitude = wallSplatTimer > 0 ? Mathf.Abs(lastSpeed) : maxRunSpeed;
+
+        if (facingRight)
+            magnitude = magnitude * -1;
+
         rbody.velocity = new Vector2(magnitude, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
@@ -538,6 +555,7 @@ public class PlayerMovement : MonoBehaviour
 
         //InAir Transition - Jumped Off
         wallStickTimer = 0;
+        wallSplatTimer = 0;
         animator.SetBool("Wallclinging", false);
         playerState = State.inAir;
         Flip();
