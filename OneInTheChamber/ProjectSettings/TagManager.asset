@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Wall
   - Bullet
+  - Target
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Bullet
   - Retrieve
   - Laser
-  - 
+  - Target
   - 
   - 
   - 
@@ -40,6 +41,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: BG
+    uniqueID: 2317594507
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

@@ -7,35 +7,30 @@ public class BulletPhysics : MonoBehaviour
     public PhysicsMaterial2D stoppedMatirial;
     public float bulletSpeed;
     public Vector2 movAngle;
-    private Rigidbody2D rbody;
     public int bounceLimit;
-    private bool dying = false;
     public LayerMask ground;
+    public LayerMask target;
+    public GameObject blastParticles;
+    private RaycastHit2D hitG;
 
     // Start is called before the first frame update
     void Start()
     {
-        rbody = GetComponent<Rigidbody2D>();
-        rbody.velocity = Vector2.zero;
-        StartCoroutine(StartMove());
+        hitG = Physics2D.Raycast(transform.position, movAngle, 1000, ground);
+        RaycastHit2D hitT = Physics2D.Raycast(transform.position, movAngle, 1000, target);
+        if(hitT.collider != null && hitT.collider.gameObject.tag == "Target")
+        {
+            hitT.collider.gameObject.GetComponent<Target>().Shatter();
+        }
+        StartCoroutine(DieCoroutine());
         GetComponent<TrailRenderer>().endColor = new Color(1, 1, 1, 0);
     }
 
     void Update()
     {
-        if(Physics2D.BoxCast(transform.position, new Vector2(.1f, .1f), 0f, Vector2.zero, .001f, ground) && !dying)
-        {
-            dying = true;
-            rbody.velocity = Vector3.zero;
-            StartCoroutine(DieCoroutine());
-        }
+        
     }
 
-    public IEnumerator StartMove()
-    {
-        yield return new WaitForSeconds(.1f);
-        rbody.velocity = movAngle * bulletSpeed;
-    }
 
     // When the bullet is retrieved
     public void Retrieve() {
@@ -59,7 +54,17 @@ public class BulletPhysics : MonoBehaviour
 
     IEnumerator DieCoroutine()
     {
-        for(int i = 0; i < 150; i++)
+        yield return new WaitForSeconds(.01f);
+        if (hitG.collider != null)
+        {
+            transform.Translate(hitG.distance * movAngle.normalized);
+        }
+        else
+        {
+            transform.Translate(100 * movAngle.normalized);
+        }
+        Instantiate(blastParticles, transform.position, transform.rotation);
+        for (int i = 0; i < 150; i++)
         {
             yield return new WaitForSeconds(.006666f);
             GetComponent<TrailRenderer>().startColor = new Color(1, 1, 1, 1-.006666f*i);
