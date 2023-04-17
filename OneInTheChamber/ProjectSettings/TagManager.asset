@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Wall
   - Bullet
+  - Target
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Bullet
   - Retrieve
   - Laser
-  - 
+  - Target
   - 
   - 
   - 

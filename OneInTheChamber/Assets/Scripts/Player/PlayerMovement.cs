@@ -273,6 +273,10 @@ public class PlayerMovement : MonoBehaviour
             laserGuide.setLaserDirection(laserDirection);
             laserGuide.showLaser();
         }
+        if(bulletTimeTimer > 0 && Input.GetMouseButtonUp(1))
+        {
+            bulletTimeTimer = -1;
+        }
         if (bulletTimeTimer < 0)
         {
             shooting = false;
@@ -287,6 +291,8 @@ public class PlayerMovement : MonoBehaviour
 
             Vector2 newVelocity = rbody.velocity + (-laserDirection.normalized * bulletForce);
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
+
+            longJump = false;
 
             laserGuide.hideLaser();
             bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
@@ -389,7 +395,7 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
             //WallCling Transition
-            else if(isOnWall() && holdingForward && rbody.velocity.y > wallThreshhold && Mathf.Abs(rbody.velocity.x) < 0.1f)
+            else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
                 animator.SetBool("Wallclinging", true);
