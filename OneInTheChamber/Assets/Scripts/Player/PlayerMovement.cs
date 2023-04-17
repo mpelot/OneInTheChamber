@@ -42,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
     LaserGuide laserGuide;
     public ParticleSystem blastTrail;
     public ParticleSystem jumpDust;
+    public ParticleSystem landDust;
+    public ParticleSystem slideDust;
     public GameObject blast;
     public Transform spriteTransform;
 
@@ -104,6 +106,8 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("Moving Backwards", false);
         }
+
+        
         
         // Calulate if the player is holding in the direction they are facing
         holdingForward = facingRight ? goalSpeed.x > 0 : goalSpeed.x < 0;
@@ -393,6 +397,7 @@ public class PlayerMovement : MonoBehaviour
                     animator.SetBool("Grounded", true);
                     ssAnimator.SetBool("Land", true);
                 }
+                landDust.Play();
             }
             //WallCling Transition
             else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
@@ -429,6 +434,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 accelValue = acceleration;
             }
+            // Sliding
+            if (Mathf.Abs(rbody.velocity.x) > Mathf.Abs(goalSpeed.x))
+                slideDust.Play();
+            else
+                slideDust.Stop();
             currentMaxSpeed = maxRunSpeed;
             coyoteTimer = coyoteTimeLength;
             canBlast = true;
@@ -438,6 +448,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 playerState = State.inAir;
                 animator.SetBool("Grounded", false);
+                slideDust.Stop();
             }
             //Cannot Transition To WallCling
         }
