@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -177,7 +178,14 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
-            AudioManager.instance.PlaySFX("Blast");
+            try
+            {
+                AudioManager.instance.PlaySFX("Blast");
+            }
+            catch (NullReferenceException)
+            {
+                Debug.LogError("AudioManager not found.");
+            }
 
             canBlast = false;
             bool ignore = false;
@@ -567,7 +575,15 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Grounded", false);   // Just trust me bro
         ssAnimator.SetBool("Stretch", true);
         jumpDust.Play();
-        AudioManager.instance.PlaySFX("Jump");
+        try
+        {
+            AudioManager.instance.PlaySFX("Jump");
+        } 
+        catch (NullReferenceException)
+        {
+            Debug.LogError("AudioManager not found");
+        }
+        
     }
 
     private void WallJump()
@@ -594,7 +610,14 @@ public class PlayerMovement : MonoBehaviour
         playerState = State.inAir;
         Flip();
 
-        AudioManager.instance.PlaySFX("Jump");
+        try
+        {
+            AudioManager.instance.PlaySFX("Jump");
+        }
+        catch (NullReferenceException)
+        {
+            Debug.LogError("AudioManager not found");
+        }
     }
 
     private Vector2 getVectorFromPlayerToMouse()
