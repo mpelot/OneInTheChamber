@@ -53,9 +53,11 @@ MonoBehaviour:
     volume: 0.7
   musicTracks:
   - sceneName: TEMPLATE Level
-    audioClip: {fileID: 8300000, guid: 870e5cd553134394b9ac6d5c1e202bdb, type: 3}
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
   - sceneName: Louis Level 5
-    audioClip: {fileID: 8300000, guid: 870e5cd553134394b9ac6d5c1e202bdb, type: 3}
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
+  - sceneName: Louis Level 6
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
   sfxSource: {fileID: 6970831805627153878}
   musicSource: {fileID: 1978227068708759853}
 --- !u!82 &6970831805627153878
