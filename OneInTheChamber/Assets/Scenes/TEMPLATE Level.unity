@@ -25760,10 +25760,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1978227068708759853, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
-      propertyPath: m_Volume
-      value: 0.2
-      objectReference: {fileID: 0}
     - target: {fileID: 6192224490664592264, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
       propertyPath: m_Name
       value: Audio Manager
@@ -25790,15 +25786,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6192224490664592265, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6192224490664592265, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6192224490664592265, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6192224490664592265, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

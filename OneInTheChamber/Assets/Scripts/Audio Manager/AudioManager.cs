@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
 
-    public List<AudioClip> sfxClips = new List<AudioClip>();
+    public List<SoundEffect> soundEffects = new List<SoundEffect>();
     public List<MusicTrack> musicTracks = new List<MusicTrack>();
 
-    private AudioSource musicSource;
+    public AudioSource sfxSource;
+    public AudioSource musicSource;
 
     public void Awake()
     {
@@ -27,22 +27,16 @@ public class AudioManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
-        musicSource = GetComponent<AudioSource>();
         SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void Start()
-    {
-        
     }
 
     public void PlaySFX(string name)
     {
-        foreach (AudioClip clip in sfxClips)
+        foreach (SoundEffect soundEffect in soundEffects)
         {
-            if (clip.name == name)
+            if (soundEffect.audioClip.name.Equals(name))
             {
-                AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position);
+                sfxSource.PlayOneShot(soundEffect.audioClip, soundEffect.volume);
             }
         }
     }
@@ -65,6 +59,13 @@ public class AudioManager : MonoBehaviour
     }
 
 
+}
+
+[Serializable]
+public class SoundEffect
+{
+    public AudioClip audioClip;
+    public float volume = 1f;
 }
 
 [Serializable]

@@ -174,6 +174,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && canBlast)
         {
+            AudioManager.instance.PlaySFX("Blast");
+
             canBlast = false;
             bool ignore = false;
             rbody.gravityScale = defaultGravity;
@@ -547,6 +549,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Grounded", false);   // Just trust me bro
         ssAnimator.SetBool("Stretch", true);
         jumpDust.Play();
+        AudioManager.instance.PlaySFX("Jump");
     }
 
     private void WallJump()
@@ -571,6 +574,8 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Wallclinging", false);
         playerState = State.inAir;
         Flip();
+
+        AudioManager.instance.PlaySFX("Jump");
     }
 
     private Vector2 getVectorFromPlayerToMouse()
