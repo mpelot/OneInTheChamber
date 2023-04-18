@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     LaserGuide laserGuide;
     public ParticleSystem blastTrail;
     public ParticleSystem jumpDust;
+    public ParticleSystem wallJumpDust;
     public ParticleSystem landDust;
     public ParticleSystem slideDust;
     public GameObject blast;
@@ -580,6 +581,7 @@ public class PlayerMovement : MonoBehaviour
         rbody.velocity = new Vector2(magnitude, jumpForce);
         coyoteTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
+        wallJumpDust.Play();
 
         // Long Jump Must Have Space Held Down (In case using Input Buffering)
         longJump = Input.GetKey(KeyCode.Space);
