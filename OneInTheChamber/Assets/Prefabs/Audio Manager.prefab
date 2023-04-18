@@ -47,8 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soundEffects:
-  - audioClip: {fileID: 8300000, guid: d50981f7c38f54844bf7deccf39370da, type: 3}
-    volume: 0.4
+  - audioClip: {fileID: 8300000, guid: acc65ce951621824393085365dbb1e67, type: 3}
+    volume: 0.7
   - audioClip: {fileID: 8300000, guid: a487a15e2147a25478c349e3ce330eb3, type: 3}
     volume: 0.7
   musicTracks:
