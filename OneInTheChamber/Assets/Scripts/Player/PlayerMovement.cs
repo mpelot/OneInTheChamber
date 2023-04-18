@@ -361,10 +361,19 @@ public class PlayerMovement : MonoBehaviour
                 bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f);
                 bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f);
                 bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20834f, transform.position.y + .4f), Vector2.up, .1f);
+                Vector2 side = Vector2.zero;
                 if (ll && !l && !rr)
-                    transform.position = new Vector3(transform.position.x + .13f, transform.position.y, 0f);
+                    side = Vector2.left;
                 if (rr && !r && !ll)
-                    transform.position = new Vector3(transform.position.x - .13f, transform.position.y, 0f);
+                    side = Vector2.right;
+                if (side != Vector2.zero)
+                {
+                    RaycastHit2D[] wall = new RaycastHit2D[1];
+                    ContactFilter2D filter = new ContactFilter2D();
+                    filter.layerMask = groundLayer;
+                    Physics2D.Raycast(new Vector2(transform.position.x + .0833f * side.x, transform.position.y + .6f), side, filter, wall);
+                    transform.position = new Vector3(transform.position.x + (.16f - wall[0].distance) * -side.x, transform.position.y, 0f);
+                }
             }
 
             // Check for partial walls and correct position
@@ -424,7 +433,7 @@ public class PlayerMovement : MonoBehaviour
                     rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * wallSpeedLoss);
                 }  
             }
-            else if(!isOnWall())
+            else if(!(isOnWall() && holdingForward))
             {
                 lastSpeed = rbody.velocity.x;
             }
