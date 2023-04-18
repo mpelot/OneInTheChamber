@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     public float wallSpeedLoss;
     public float wallSpeedDecay;
     public float wallSplatTime;
+    public float upBlastTime;
 
     //Firing
     [Header("Firing")]
@@ -61,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
     private float jumpCooldownTimer = 0;
     private float wallSplatTimer = 0;
     private float wallStickTimer = 0;
+    private float upBlastTimer = 0;
     private bool holdingForward = false;
     private float bulletTimeTimer = 0;
     private float currentMaxSpeed;
@@ -204,6 +206,7 @@ public class PlayerMovement : MonoBehaviour
                     float minY = 6f;
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
+                    upBlastTimer = upBlastTime;
                     animator.SetBool("Grounded", false);
                     animator.SetBool("Down Blast", true);
                     ssAnimator.SetBool("Stretch", true);
@@ -410,8 +413,11 @@ public class PlayerMovement : MonoBehaviour
                 {
                     ssAnimator.SetBool("WallSplat", true);
                     wallSplatTimer = wallSplatTime;
-                    rbody.gravityScale = 0f;
-                    rbody.velocity = Vector2.zero;
+                    if (upBlastTimer <= 0f)
+                    {
+                        rbody.gravityScale = 0f;
+                        rbody.velocity = Vector2.zero;
+                    }
                 } else
                 {
                     rbody.gravityScale = wallGravity;
@@ -516,6 +522,8 @@ public class PlayerMovement : MonoBehaviour
             wallStickTimer -= Time.fixedDeltaTime;
         if (wallSplatTimer > 0)
             wallSplatTimer -= Time.fixedDeltaTime;
+        if (upBlastTimer > 0)
+            upBlastTimer -= Time.fixedDeltaTime;
         if (bulletTimeTimer > 0)
             bulletTimeTimer -= Time.fixedUnscaledDeltaTime;  // Time has to be unscaled here or it will be affected by the slowdown
     }
