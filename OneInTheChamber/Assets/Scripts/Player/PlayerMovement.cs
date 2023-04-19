@@ -38,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject bulletPrefab;
     public float bulletForce;
     public float bulletTimeLength;
+    public float blastCooldownTime;
     public float bulletTimeSlowdownFactor;
     public Animator bulletTimeIndicatorAnimator;
     public bool canBlast = true;
@@ -67,6 +68,7 @@ public class PlayerMovement : MonoBehaviour
     private float upBlastTimer = 0;
     private bool holdingForward = false;
     private float bulletTimeTimer = 0;
+    private float blastCoolDownTimer = 0;
     private float currentMaxSpeed;
     private float accelValue;
     private Vector2 goalSpeed;
@@ -110,8 +112,6 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("Moving Backwards", false);
         }
-
-        
         
         // Calulate if the player is holding in the direction they are facing
         holdingForward = facingRight ? goalSpeed.x > 0 : goalSpeed.x < 0;
@@ -176,20 +176,16 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("FW Blast", false);
         ssAnimator.SetBool("Squash", false);
 
-        if (Input.GetMouseButtonDown(0) && canBlast)
+        if (Input.GetMouseButtonDown(0) && canBlast && blastCoolDownTimer <= 0)
         {
-            try
-            {
-                AudioManager.instance.PlaySFX("Blast");
-            }
-            catch (NullReferenceException)
-            {
-                Debug.LogError("AudioManager not found.");
-            }
-
             canBlast = false;
             bool ignore = false;
             rbody.gravityScale = defaultGravity;
+
+            if (playerState == State.onGround)
+            {
+                blastCoolDownTimer = blastCooldownTime;
+            }
 
             if (playerState == State.wallCling)
             {
@@ -257,8 +253,14 @@ public class PlayerMovement : MonoBehaviour
                 // Play particle effect
                 blastTrail.Play();
 
-                //GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
-                //newBullet.GetComponent<BulletPhysics>().movAngle = blastDirection;
+                try
+                {
+                    AudioManager.instance.PlaySFX("Blast");
+                }
+                catch (NullReferenceException)
+                {
+                    Debug.LogError("AudioManager not found.");
+                }
             }
         }
 
@@ -470,6 +472,7 @@ public class PlayerMovement : MonoBehaviour
                 playerState = State.inAir;
                 animator.SetBool("Grounded", false);
                 slideDust.Stop();
+                blastCoolDownTimer = 0;
             }
             //Cannot Transition To WallCling
         }
@@ -489,7 +492,11 @@ public class PlayerMovement : MonoBehaviour
                 WallJump();
             }
             if (wallSplatTimer <= 0)
+            {
                 rbody.gravityScale = wallGravity;
+                lastSpeed = 0;
+            }
+                
             //InAir Transition - Jumped Off Located In WallJump()
             //InAir Transition - Shot Located In Shooting()
             //InAir Transition - Let Go
@@ -501,7 +508,7 @@ public class PlayerMovement : MonoBehaviour
                 Flip();
             }
             //InAir Transition - Slid Off
-            else if(rbody.velocity.y < wallThreshhold || !isOnWall())
+            else if(!isOnWall())
             {
                 playerState = State.inAir;
                 animator.SetBool("Wallclinging", false);
@@ -542,6 +549,8 @@ public class PlayerMovement : MonoBehaviour
             wallSplatTimer -= Time.fixedDeltaTime;
         if (upBlastTimer > 0)
             upBlastTimer -= Time.fixedDeltaTime;
+        if (blastCoolDownTimer > 0)
+            blastCoolDownTimer -= Time.fixedDeltaTime;
         if (bulletTimeTimer > 0)
             bulletTimeTimer -= Time.fixedUnscaledDeltaTime;  // Time has to be unscaled here or it will be affected by the slowdown
     }
@@ -583,7 +592,6 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogError("AudioManager not found");
         }
-        
     }
 
     private void WallJump()

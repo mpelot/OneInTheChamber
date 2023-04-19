@@ -5033,6 +5033,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 8
   bulletTimeLength: 0.5
+  blastCooldownTime: 1
   bulletTimeSlowdownFactor: 0.25
   bulletTimeIndicatorAnimator: {fileID: 2861250681970622655}
   canBlast: 1
