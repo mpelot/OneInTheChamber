@@ -5029,7 +5029,7 @@ MonoBehaviour:
   wallSpeedLoss: 0.6
   wallSpeedDecay: 3
   wallSplatTime: 0.3
-  upBlastTime: 0.2
+  yBlastTime: 0.2
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 8
   bulletTimeLength: 0.5

@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
     public float wallSpeedLoss;
     public float wallSpeedDecay;
     public float wallSplatTime;
-    public float upBlastTime;
+    public float yBlastTime;
 
     //Firing
     [Header("Firing")]
@@ -65,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
     private float jumpCooldownTimer = 0;
     private float wallSplatTimer = 0;
     private float wallStickTimer = 0;
-    private float upBlastTimer = 0;
+    private float yBlastTimer = 0;
     private bool holdingForward = false;
     private float bulletTimeTimer = 0;
     private float blastCoolDownTimer = 0;
@@ -211,7 +211,7 @@ public class PlayerMovement : MonoBehaviour
                     float minY = 6f;
                     if (rbody.velocity.y + bulletForce < minY)
                         newVelocity = new Vector2(rbody.velocity.x, minY);
-                    upBlastTimer = upBlastTime;
+                    yBlastTimer = yBlastTime;
                     animator.SetBool("Grounded", false);
                     animator.SetBool("Down Blast", true);
                     ssAnimator.SetBool("Stretch", true);
@@ -222,6 +222,7 @@ public class PlayerMovement : MonoBehaviour
                     jumpCooldownTimer = coyoteTimeLength;
                     animator.SetBool("Up Blast", true);
                     ssAnimator.SetBool("Stretch", true);
+                    yBlastTimer = yBlastTime;
                 }
                 else
                 {
@@ -395,13 +396,16 @@ public class PlayerMovement : MonoBehaviour
                 bool d = Physics2D.Raycast(new Vector2(transform.position.x + .3f * dir.x, transform.position.y - .499f), dir, .1f, groundLayer);
                 if (d && !u)
                 {
+                    RaycastHit2D[] wall = new RaycastHit2D[1];
                     RaycastHit2D[] floor = new RaycastHit2D[1];
                     ContactFilter2D filter = new ContactFilter2D();
                     filter.layerMask = groundLayer;
+                    Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - .6f), dir, filter, wall);
                     Physics2D.Raycast(new Vector2(transform.position.x + .5f * dir.x, transform.position.y - .25f), Vector2.down, filter, floor);
                     if (inputBufferTimer <= 0)
                         animator.SetBool("Grounded", true);
-                    transform.position = new Vector3(transform.position.x + .1f * dir.x, transform.position.y + .28f - floor[0].distance, 0f);
+                    //transform.position = new Vector3(transform.position.x + .1f * dir.x, transform.position.y + .28f - floor[0].distance, 0f);
+                    transform.position = new Vector3(transform.position.x + (wall[0].distance - .2f) * dir.x, transform.position.y + .285f - floor[0].distance, 0f);
                     rbody.velocity = new Vector2(rbody.velocity.x, 0f);
                     
                 }
@@ -411,17 +415,10 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded())
             {
                 canBlast = true;
-                if (inputBufferTimer > 0)
-                {
-                    Jump();
-                }
-                else
-                {
-                    playerState = State.onGround;
-                    rbody.gravityScale = defaultGravity;
-                    animator.SetBool("Grounded", true);
-                    ssAnimator.SetBool("Land", true);
-                }
+                playerState = State.onGround;
+                rbody.gravityScale = defaultGravity;
+                animator.SetBool("Grounded", true);
+                ssAnimator.SetBool("Land", true);
                 landDust.Play();
             }
             //WallCling Transition
@@ -433,7 +430,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     ssAnimator.SetBool("WallSplat", true);
                     wallSplatTimer = wallSplatTime;
-                    if (upBlastTimer <= 0f)
+                    if (yBlastTimer <= 0f)
                     {
                         rbody.gravityScale = 0f;
                         rbody.velocity = Vector2.zero;
@@ -452,6 +449,10 @@ public class PlayerMovement : MonoBehaviour
         // ON GROUND
         else if (playerState == State.onGround)
         {
+            if (inputBufferTimer > 0)
+            {
+                Jump();
+            }
             // If Decelerating
             if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
             {
@@ -547,8 +548,8 @@ public class PlayerMovement : MonoBehaviour
             wallStickTimer -= Time.fixedDeltaTime;
         if (wallSplatTimer > 0)
             wallSplatTimer -= Time.fixedDeltaTime;
-        if (upBlastTimer > 0)
-            upBlastTimer -= Time.fixedDeltaTime;
+        if (yBlastTimer > 0)
+            yBlastTimer -= Time.fixedDeltaTime;
         if (blastCoolDownTimer > 0)
             blastCoolDownTimer -= Time.fixedDeltaTime;
         if (bulletTimeTimer > 0)
