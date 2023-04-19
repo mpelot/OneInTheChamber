@@ -232,14 +232,11 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 if (facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
-                {
                     animator.SetBool("BW Blast", true);
-                } 
                 else
-                {
                     animator.SetBool("FW Blast", true);
-                }
-                ssAnimator.SetBool("Squash", true);
+                if (playerState == State.inAir)
+                    ssAnimator.SetBool("Squash", true);
             }
             
             if (!ignore)
@@ -404,10 +401,8 @@ public class PlayerMovement : MonoBehaviour
                     Physics2D.Raycast(new Vector2(transform.position.x + .5f * dir.x, transform.position.y - .25f), Vector2.down, filter, floor);
                     if (inputBufferTimer <= 0)
                         animator.SetBool("Grounded", true);
-                    //transform.position = new Vector3(transform.position.x + .1f * dir.x, transform.position.y + .28f - floor[0].distance, 0f);
                     transform.position = new Vector3(transform.position.x + (wall[0].distance - .2f) * dir.x, transform.position.y + .285f - floor[0].distance, 0f);
                     rbody.velocity = new Vector2(rbody.velocity.x, 0f);
-                    
                 }
             }
 

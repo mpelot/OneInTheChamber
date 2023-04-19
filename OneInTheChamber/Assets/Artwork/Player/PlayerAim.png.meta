@@ -284,27 +284,6 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: PlayerAim_8
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 0
-        width: 24
-        height: 24
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f7cfc0626c98eef4db306de3587ccdff
-      internalID: -2014242151
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -318,7 +297,6 @@ TextureImporter:
     nameFileIdTable:
       PlayerAim_2: -150561576
       PlayerAim_0: -1593978125
-      PlayerAim_8: -2014242151
       PlayerAim_4: 545009619
       PlayerAim_7: -1910765907
       PlayerAim_5: 1938873801
