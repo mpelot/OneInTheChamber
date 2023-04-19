@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Bouncepad : MonoBehaviour
 {
+	[Header("Bouncepad Setup")]
+	public float amount = 20;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,7 +23,7 @@ public class Bouncepad : MonoBehaviour
         if(collision.gameObject.tag == "Player")
         {
 			Rigidbody2D rbody = collision.gameObject.GetComponent<Rigidbody2D>();
-			rbody.velocity = new Vector2(rbody.velocity.x, 20.5f);
+			rbody.velocity = new Vector2(rbody.velocity.x, amount);
         }
     }
 }
