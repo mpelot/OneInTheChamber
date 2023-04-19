@@ -30,6 +30,6 @@ public class Target : MonoBehaviour
 
     public void Shatter()
     {
-        // Call this when the beam raycast detects the target
+        GameObject.Find("LevelManager").GetComponent<LevelManager>().Win();
     }
 }

@@ -5,27 +5,33 @@ using UnityEngine;
 public class BulletPhysics : MonoBehaviour
 {
     public PhysicsMaterial2D stoppedMatirial;
-	[HideInInspector]
-    public Vector2 movAngle;
     public float bulletSpeed;
-    private Rigidbody2D rbody;
+    public Vector2 movAngle;
     public int bounceLimit;
+    public LayerMask ground;
+    public LayerMask target;
+    public GameObject blastParticles;
+    private RaycastHit2D hitG;
 
     // Start is called before the first frame update
     void Start()
     {
-        rbody = GetComponent<Rigidbody2D>();
-        rbody.velocity = movAngle * bulletSpeed;
+        hitG = Physics2D.Raycast(transform.position, movAngle, 1000, ground);
+        RaycastHit2D hitT = Physics2D.Raycast(transform.position, movAngle, 1000, target);
+        if(hitT.collider != null && hitT.collider.gameObject.tag == "Target")
+        {
+            hitT.collider.gameObject.GetComponent<Target>().Shatter();
+        }
+        StartCoroutine(DieCoroutine());
+        GetComponent<TrailRenderer>().endColor = new Color(1, 1, 1, 0);
     }
 
-    // Update is called once per frame
     void Update()
     {
-		// Move
-		//transform.position = transform.position + new Vector3(Mathf.Cos(movAngle) * 0.05f, Mathf.Sin(movAngle) * 0.05f, 0);
-		
-		// TODO: move this over to the rigidbody system
+        
     }
+
+
     // When the bullet is retrieved
     public void Retrieve() {
         // Destroy bullet
@@ -33,15 +39,36 @@ public class BulletPhysics : MonoBehaviour
     }
 
     // When the bullet bounces
-    private void OnCollisionEnter2D(Collision2D collision) 
+    /*private void OnCollisionEnter2D(Collision2D collision) 
     {
         // Enable the trigger collider for retrieval
-        GetComponentInChildren<CircleCollider2D>().enabled = true;
-        bounceLimit--;
-        if (bounceLimit == 0) {
+        //GetComponentInChildren<CircleCollider2D>().enabled = true;
+        //bounceLimit--;
+        //if (bounceLimit == 0) {
             rbody.velocity = Vector3.zero;
-            rbody.gravityScale = 1;
-            GetComponent<BoxCollider2D>().sharedMaterial = stoppedMatirial;
+            //GetComponent<BoxCollider2D>().sharedMaterial = stoppedMatirial;
+            StartCoroutine(DieCoroutine());
+        //}
+    }*/
+
+
+    IEnumerator DieCoroutine()
+    {
+        yield return new WaitForSeconds(.01f);
+        if (hitG.collider != null)
+        {
+            transform.Translate(hitG.distance * movAngle.normalized);
         }
+        else
+        {
+            transform.Translate(100 * movAngle.normalized);
+        }
+        Instantiate(blastParticles, transform.position, transform.rotation);
+        for (int i = 0; i < 150; i++)
+        {
+            yield return new WaitForSeconds(.006666f);
+            GetComponent<TrailRenderer>().startColor = new Color(1, 1, 1, 1-.006666f*i);
+        }
+        Destroy(gameObject);
     }
 }
