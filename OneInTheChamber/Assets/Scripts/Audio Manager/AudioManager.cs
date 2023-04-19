@@ -53,6 +53,7 @@ public class AudioManager : MonoBehaviour
                 }
                 musicSource.Stop();
                 musicSource.clip = musicTrack.audioClip;
+                musicSource.volume = musicTrack.volume;
                 musicSource.Play();
             }
         }
@@ -73,4 +74,5 @@ public class MusicTrack
 {
     public string sceneName;
     public AudioClip audioClip;
+    public float volume = 1f;
 }
