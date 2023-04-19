@@ -61,9 +61,15 @@ MonoBehaviour:
   - sceneName: Louis Level 6
     audioClip: {fileID: 8300000, guid: 535600a5aebb37948b964217191e224a, type: 3}
     volume: 0.24
-  - sceneName: Louis Level 8
+  - sceneName: Max Level 1
     audioClip: {fileID: 8300000, guid: 535600a5aebb37948b964217191e224a, type: 3}
     volume: 0.24
+  - sceneName: Max Level 2
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
+    volume: 0.12
+  - sceneName: Louis Level 8
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
+    volume: 0.12
   sfxSource: {fileID: 6970831805627153878}
   musicSource: {fileID: 1978227068708759853}
 --- !u!82 &6970831805627153878
