@@ -34852,6 +34852,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6192224490664592266, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
+      propertyPath: musicTracks.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6192224490664592266, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
+      propertyPath: musicTracks.Array.data[3].audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 535600a5aebb37948b964217191e224a, type: 3}
+    - target: {fileID: 6192224490664592266, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
+      propertyPath: musicTracks.Array.data[3].sceneName
+      value: Max Level 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
 --- !u!1 &2140381117
@@ -35481,6 +35493,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2240345805026789524, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
+      propertyPath: nextScene
+      value: Max Level 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2240345805026789525, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
       propertyPath: m_Name
       value: LevelManager
@@ -35772,7 +35788,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7094998732382184207, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
       propertyPath: orthographic size
-      value: 7.9583335
+      value: 7.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
