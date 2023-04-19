@@ -459,16 +459,16 @@ public class PlayerMovement : MonoBehaviour
                 accelValue = acceleration;
             }
             currentMaxSpeed = maxRunSpeed;
-            coyoteTimer = coyoteTimeLength;
             canBlast = true;
             lastSpeed = rbody.velocity.x;
             //Air Transition
             if (isGrounded() == false)
             {
                 playerState = State.inAir;
+                coyoteTimer = coyoteTimeLength;
+                blastCoolDownTimer = 0;
                 animator.SetBool("Grounded", false);
                 slideDust.Stop();
-                blastCoolDownTimer = 0;
             }
             //Cannot Transition To WallCling
         }
@@ -573,6 +573,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rbody.velocity = new Vector2(rbody.velocity.x, jumpForce);
         coyoteTimer = 0;
+        inputBufferTimer = 0;
         jumpCooldownTimer = jumpCooldownLength;
         // Long Jump Must Have Space Held Down (In case using Input Buffering)
         longJump = Input.GetKey(KeyCode.Space);
