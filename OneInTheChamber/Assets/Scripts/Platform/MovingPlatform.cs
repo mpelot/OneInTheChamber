@@ -58,7 +58,6 @@ public class MovingPlatform : MonoBehaviour
         {
             attached = true;
             collision.gameObject.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.None;
-            collision.gameObject.GetComponent<Rigidbody2D>().velocity -= rbody.velocity;
         }
     }
 
