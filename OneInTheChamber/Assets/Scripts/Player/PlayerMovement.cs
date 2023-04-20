@@ -14,6 +14,8 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 trueMaxSpeed;
     public enum State { inAir, onGround, wallCling };
     public State playerState = State.inAir;
+    [HideInInspector]
+    public Vector2 platformVelocity;
 
     //Jumping
     [Header("Jumping")]
@@ -77,6 +79,7 @@ public class PlayerMovement : MonoBehaviour
     private bool shooting = false;
     private Camera mainCam;
     public float lastSpeed;
+    private Vector2 lastPlatformVelocity;
 
     void Start()
     {

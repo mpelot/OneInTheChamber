@@ -34,16 +34,15 @@ public class MovingPlatform : MonoBehaviour
 
     private void Update()
     {
-        
+        if (attached && (rbody.velocity.y < 0 || rbody.velocity.x != 0))
+        {
+            GameObject.Find("Player").transform.Translate(transform.position - (Vector3)lastPos);
+        }
+        lastPos = transform.position;
     }
 
     void FixedUpdate()
     {
-        if (attached && (rbody.velocity.y < 0 || rbody.velocity.x != 0))
-        {
-            GameObject.Find("Player").transform.Translate((Vector2)transform.position - lastPos);
-        }
-        lastPos = (Vector2)transform.position;
         timer += Time.fixedDeltaTime * (2*Mathf.PI) / time;
         if(timer >= Mathf.PI * 2)
         {
@@ -58,6 +57,8 @@ public class MovingPlatform : MonoBehaviour
         if(collision.gameObject.tag == "Player")
         {
             attached = true;
+            collision.gameObject.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.None;
+            collision.gameObject.GetComponent<Rigidbody2D>().velocity -= rbody.velocity;
         }
     }
 
@@ -66,6 +67,8 @@ public class MovingPlatform : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             attached = false;
+            collision.gameObject.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.Interpolate;
+            collision.gameObject.GetComponent<Rigidbody2D>().velocity += rbody.velocity;
         }
     }
 }
