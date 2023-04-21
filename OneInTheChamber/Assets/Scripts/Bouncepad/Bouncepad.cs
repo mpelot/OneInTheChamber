@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bouncepad : MonoBehaviour
 {
 	[Header("Bouncepad Setup")]
-	public float amount = 20;
+	public float strength = 20f;
 
     private Animator animator;
     private bool bounce;
@@ -30,15 +30,8 @@ public class Bouncepad : MonoBehaviour
     {
         if(collision.gameObject.tag == "Player")
         {
-            GameObject player = collision.gameObject;
-            if (player.GetComponent<PlayerMovement>().playerState != PlayerMovement.State.wallCling)
-            {
-                player.transform.position = new Vector3(player.transform.position.x, transform.position.y + .5f, 0f);
-                Rigidbody2D rbody = player.GetComponent<Rigidbody2D>();
-                rbody.velocity = new Vector2(rbody.velocity.x, amount);
-                player.GetComponent<PlayerMovement>().canBlast = true;
-                bounce = true;
-            }
+            collision.gameObject.GetComponent<PlayerMovement>().Bounce(strength);
+            bounce = true;
         }
     }
 }

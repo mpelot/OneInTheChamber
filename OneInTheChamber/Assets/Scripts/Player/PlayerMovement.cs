@@ -63,6 +63,7 @@ public class PlayerMovement : MonoBehaviour
     public Animator ssAnimator;
     public bool facingRight = true;
     private float coyoteTimer = 0;
+    private bool coyoteTime = false;
     private float inputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
     private float wallSplatTimer = 0;
@@ -130,7 +131,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 // If Coyote Timer Is Active, Jump
-                if (coyoteTimer > 0)
+                if (coyoteTimer > 0 && coyoteTime)
                 {
                     Jump();
                 }
@@ -370,10 +371,10 @@ public class PlayerMovement : MonoBehaviour
             // Check for partial ceilings and correct position
             if (rbody.velocity.y > 1f && !isOnWall())
             {
-                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20834f, transform.position.y + .4f), Vector2.up, .1f);
-                bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f);
-                bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f);
-                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20834f, transform.position.y + .4f), Vector2.up, .1f);
+                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20834f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
+                bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
+                bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
+                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20834f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
                 Vector2 side = Vector2.zero;
                 if (ll && !l && !rr)
                     side = Vector2.left;
@@ -414,6 +415,7 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded())
             {
                 canBlast = true;
+                coyoteTime = true;
                 playerState = State.onGround;
                 rbody.gravityScale = defaultGravity;
                 animator.SetBool("Grounded", true);
@@ -427,7 +429,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("Wallclinging", true);
                 if (rbody.velocity.y > trueMaxSpeed.y)
                     rbody.velocity = new Vector2(rbody.velocity.x, trueMaxSpeed.y);
-                if (Mathf.Abs(lastSpeed) > maxRunSpeed)
+                if (Mathf.Abs(lastSpeed) > maxRunSpeed && rbody.velocity.y < trueMaxSpeed.y)
                 {
                     ssAnimator.SetBool("WallSplat", true);
                     wallSplatTimer = wallSplatTime;
@@ -521,6 +523,7 @@ public class PlayerMovement : MonoBehaviour
             //OnGround Transition
             else if(isGrounded())
             {
+                coyoteTime = true;
                 wallStickTimer = 0;
                 playerState = State.onGround;
                 animator.SetBool("Wallclinging", false);
@@ -628,6 +631,17 @@ public class PlayerMovement : MonoBehaviour
         catch (NullReferenceException)
         {
             Debug.LogError("AudioManager not found");
+        }
+    }
+
+    public void Bounce(float strength)
+    {
+        if (playerState != State.wallCling)
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y + .5f, 0f);
+            rbody.velocity = new Vector2(rbody.velocity.x, strength);
+            canBlast = true;
+            coyoteTime = false;
         }
     }
 
