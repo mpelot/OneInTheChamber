@@ -244,7 +244,8 @@ public class PlayerMovement : MonoBehaviour
             
             if (!ignore)
             {
-                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
+                float y = rbody.velocity.y > trueMaxSpeed.y ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
+                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
 
                 longJump = false;
 
@@ -424,6 +425,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 playerState = State.wallCling;
                 animator.SetBool("Wallclinging", true);
+                if (rbody.velocity.y > trueMaxSpeed.y)
+                    rbody.velocity = new Vector2(rbody.velocity.x, trueMaxSpeed.y);
                 if (Mathf.Abs(lastSpeed) > maxRunSpeed)
                 {
                     ssAnimator.SetBool("WallSplat", true);
