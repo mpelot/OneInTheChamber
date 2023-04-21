@@ -245,7 +245,7 @@ public class PlayerMovement : MonoBehaviour
             
             if (!ignore)
             {
-                float y = rbody.velocity.y > trueMaxSpeed.y ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
+                float y = rbody.velocity.y > trueMaxSpeed.y && blastDirection != Vector2.up ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
                 rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
 
                 longJump = false;
@@ -638,7 +638,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (playerState != State.wallCling)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y + .5f, 0f);
+            transform.position = new Vector3(transform.position.x, transform.position.y + .3f, 0f);
             rbody.velocity = new Vector2(rbody.velocity.x, strength);
             canBlast = true;
             coyoteTime = false;
