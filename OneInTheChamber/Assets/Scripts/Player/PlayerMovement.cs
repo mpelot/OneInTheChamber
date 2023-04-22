@@ -14,12 +14,15 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 trueMaxSpeed;
     public enum State { inAir, onGround, wallCling };
     public State playerState = State.inAir;
+    [HideInInspector]
+    public Vector2 platformVelocity;
 
     //Jumping
     [Header("Jumping")]
     public float jumpForce;
     public float coyoteTimeLength;
     public float inputBufferLength;
+    public float lRInputBufferLength;
     public float jumpCooldownLength;
     public float defaultGravity;
     public float longJumpGravity;
@@ -40,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletTimeLength;
     public float blastCooldownTime;
     public float bulletTimeSlowdownFactor;
-    public Animator bulletTimeIndicatorAnimator;
+    public Animator aimEffectAnimator;
     public bool canBlast = true;
     LaserGuide laserGuide;
     public ParticleSystem blastTrail;
@@ -61,7 +64,10 @@ public class PlayerMovement : MonoBehaviour
     public Animator ssAnimator;
     public bool facingRight = true;
     private float coyoteTimer = 0;
+    private bool coyoteTime = false;
     private float inputBufferTimer = 0;
+    public float lInputBufferTimer = 0;
+    public float rInputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
     private float wallSplatTimer = 0;
     private float wallStickTimer = 0;
@@ -77,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
     private bool shooting = false;
     private Camera mainCam;
     public float lastSpeed;
+    private Vector2 lastPlatformVelocity;
 
     void Start()
     {
@@ -127,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 // If Coyote Timer Is Active, Jump
-                if (coyoteTimer > 0)
+                if (coyoteTimer > 0 && coyoteTime)
                 {
                     Jump();
                 }
@@ -175,6 +182,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("BW Blast", false);
         animator.SetBool("FW Blast", false);
         ssAnimator.SetBool("Squash", false);
+        aimEffectAnimator.SetBool("AimEffect", false);
 
         if (Input.GetMouseButtonDown(0) && canBlast && blastCoolDownTimer <= 0)
         {
@@ -241,7 +249,8 @@ public class PlayerMovement : MonoBehaviour
             
             if (!ignore)
             {
-                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
+                float y = rbody.velocity.y > trueMaxSpeed.y && blastDirection != Vector2.up ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
+                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
 
                 longJump = false;
 
@@ -273,6 +282,7 @@ public class PlayerMovement : MonoBehaviour
             canBlast = false;
 
             animator.SetBool("Aiming", true);
+            aimEffectAnimator.SetBool("AimEffect", true);
 
             // Start bullet time timer
             bulletTimeTimer = bulletTimeLength;
@@ -280,7 +290,6 @@ public class PlayerMovement : MonoBehaviour
             // Set time scale to the slowdown factor
             Time.timeScale = bulletTimeSlowdownFactor;
             Time.fixedDeltaTime = Time.timeScale * .02f;
-            bulletTimeIndicatorAnimator.SetBool("BulletTime", true);
         }
         if (shooting) {
             Vector2 laserDirection = getVectorFromPlayerToMouse();
@@ -313,7 +322,7 @@ public class PlayerMovement : MonoBehaviour
             longJump = false;
 
             laserGuide.hideLaser();
-            bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
+            //bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
 
             // Reset bullet time parameters
             bulletTimeTimer = 0;
@@ -326,6 +335,16 @@ public class PlayerMovement : MonoBehaviour
         {
             // Reload Scene
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        //L And R Input Buffer
+        if (Input.GetAxisRaw("Horizontal") < 0)
+        {
+            lInputBufferTimer = lRInputBufferLength;
+        }
+        else if (Input.GetAxisRaw("Horizontal") > 0)
+        {
+            rInputBufferTimer = lRInputBufferLength;
         }
     }
 
@@ -366,10 +385,10 @@ public class PlayerMovement : MonoBehaviour
             // Check for partial ceilings and correct position
             if (rbody.velocity.y > 1f && !isOnWall())
             {
-                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20834f, transform.position.y + .4f), Vector2.up, .1f);
-                bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f);
-                bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f);
-                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20834f, transform.position.y + .4f), Vector2.up, .1f);
+                bool ll = Physics2D.Raycast(new Vector2(transform.position.x - .20834f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
+                bool l = Physics2D.Raycast(new Vector2(transform.position.x - .0833f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
+                bool r = Physics2D.Raycast(new Vector2(transform.position.x + .0833f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
+                bool rr = Physics2D.Raycast(new Vector2(transform.position.x + .20834f, transform.position.y + .4f), Vector2.up, .1f, groundLayer);
                 Vector2 side = Vector2.zero;
                 if (ll && !l && !rr)
                     side = Vector2.left;
@@ -410,18 +429,23 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded())
             {
                 canBlast = true;
+                coyoteTime = true;
                 playerState = State.onGround;
                 rbody.gravityScale = defaultGravity;
                 animator.SetBool("Grounded", true);
                 ssAnimator.SetBool("Land", true);
                 landDust.Play();
+                AudioManager.instance.PlaySFX("Land");
             }
             //WallCling Transition
-            else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
+            else if(isOnWall() && (holdingForward || (!holdingForward && facingRight && rInputBufferTimer > 0) || (!holdingForward && !facingRight && lInputBufferTimer > 0)) && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
+                wallStickTimer = wallStickTime;
                 animator.SetBool("Wallclinging", true);
-                if (Mathf.Abs(lastSpeed) > maxRunSpeed)
+                if (rbody.velocity.y > trueMaxSpeed.y)
+                    rbody.velocity = new Vector2(rbody.velocity.x, trueMaxSpeed.y);
+                if (Mathf.Abs(lastSpeed) > maxRunSpeed && rbody.velocity.y < trueMaxSpeed.y)
                 {
                     ssAnimator.SetBool("WallSplat", true);
                     wallSplatTimer = wallSplatTime;
@@ -430,6 +454,12 @@ public class PlayerMovement : MonoBehaviour
                         rbody.gravityScale = 0f;
                         rbody.velocity = Vector2.zero;
                     }
+
+                    if (Mathf.Abs(lastSpeed) > maxRunSpeed * 1.5f)
+                    {
+                        AudioManager.instance.PlaySFX("Splat");
+                    }
+                    
                 } else
                 {
                     rbody.gravityScale = wallGravity;
@@ -515,6 +545,7 @@ public class PlayerMovement : MonoBehaviour
             //OnGround Transition
             else if(isGrounded())
             {
+                coyoteTime = true;
                 wallStickTimer = 0;
                 playerState = State.onGround;
                 animator.SetBool("Wallclinging", false);
@@ -537,6 +568,10 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimer -= Time.fixedDeltaTime;
         if (inputBufferTimer > 0)
             inputBufferTimer -= Time.fixedDeltaTime;
+        if (lInputBufferTimer > 0)
+            lInputBufferTimer -= Time.fixedDeltaTime;
+        if (rInputBufferTimer > 0)
+            rInputBufferTimer -= Time.fixedDeltaTime;
         if (jumpCooldownTimer > 0)
             jumpCooldownTimer -= Time.fixedDeltaTime;
         if (wallStickTimer > 0)
@@ -622,6 +657,18 @@ public class PlayerMovement : MonoBehaviour
         catch (NullReferenceException)
         {
             Debug.LogError("AudioManager not found");
+        }
+    }
+
+    public void Bounce(float strength)
+    {
+        if (playerState != State.wallCling)
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y + .3f, 0f);
+            rbody.velocity = new Vector2(rbody.velocity.x, strength);
+            canBlast = true;
+            coyoteTime = false;
+            AudioManager.instance.PlaySFX("Bounce");
         }
     }
 

@@ -14,6 +14,8 @@ public class AudioManager : MonoBehaviour
     public AudioSource sfxSource;
     public AudioSource musicSource;
 
+    private AudioLowPassFilter musicLowPassFilter;
+
     public void Awake()
     {
         if (instance == null)
@@ -27,6 +29,9 @@ public class AudioManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(gameObject);
+
+        musicLowPassFilter = musicSource.gameObject.GetComponent<AudioLowPassFilter>();
+
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -53,12 +58,23 @@ public class AudioManager : MonoBehaviour
                 }
                 musicSource.Stop();
                 musicSource.clip = musicTrack.audioClip;
+                musicSource.volume = musicTrack.volume;
+                StartCoroutine(SweepLPF(10f, 22000f, 2f));
                 musicSource.Play();
             }
         }
     }
-
-
+    private IEnumerator SweepLPF(float startFrequency, float targetFrequency, float duration)
+    {
+        float time = 0f;
+        while (time < duration)
+        {
+            musicLowPassFilter.cutoffFrequency = Mathf.Lerp(startFrequency, targetFrequency, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        musicLowPassFilter.cutoffFrequency = targetFrequency;
+    }
 }
 
 [Serializable]
@@ -73,4 +89,5 @@ public class MusicTrack
 {
     public string sceneName;
     public AudioClip audioClip;
+    public float volume = 1f;
 }

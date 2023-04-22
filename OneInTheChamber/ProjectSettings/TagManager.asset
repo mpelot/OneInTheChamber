@@ -17,7 +17,7 @@ TagManager:
   - Player
   - Ground
   - Bullet
-  - Retrieve
+  - Bouncepad
   - Laser
   - Target
   - 
