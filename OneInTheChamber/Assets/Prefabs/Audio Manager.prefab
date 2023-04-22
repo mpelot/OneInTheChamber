@@ -363,6 +363,24 @@ MonoBehaviour:
   - sceneName: Max Level 1
     audioClip: {fileID: 8300000, guid: 535600a5aebb37948b964217191e224a, type: 3}
     volume: 0.36
+  - sceneName: Tutorial 1
+    audioClip: {fileID: 8300000, guid: b1699268fb0954e4fa5ee0303b98c77f, type: 3}
+    volume: 0.48
+  - sceneName: Tutorial 3
+    audioClip: {fileID: 8300000, guid: 0b1a7413c1fa6654cb6da31b436ddb2e, type: 3}
+    volume: 0.48
+  - sceneName: Tutorial 4
+    audioClip: {fileID: 8300000, guid: 0b1a7413c1fa6654cb6da31b436ddb2e, type: 3}
+    volume: 0.48
+  - sceneName: Tutorial 5
+    audioClip: {fileID: 8300000, guid: c701210d375da57438974fd9e2e30011, type: 3}
+    volume: 0.48
+  - sceneName: Tutorial 6
+    audioClip: {fileID: 8300000, guid: c701210d375da57438974fd9e2e30011, type: 3}
+    volume: 0.48
+  - sceneName: Tutorial 7
+    audioClip: {fileID: 8300000, guid: fde4b0388403f944ab954e17b780c77f, type: 3}
+    volume: 0.48
   sfxSource: {fileID: 787049501645648840}
   musicSource: {fileID: 709361881745791538}
   slideSource: {fileID: 5448735954692442499}
