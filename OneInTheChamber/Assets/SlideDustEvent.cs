@@ -11,7 +11,7 @@ public class SlideDustEvent : StateMachineBehaviour
     {
         dust = animator.gameObject.GetComponent<PlayerMovement>().slideDust;
         dust.Play();
-        AudioManager.instance.PlaySFX("Slide");
+        AudioManager.instance.EnableSlide();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
@@ -24,6 +24,7 @@ public class SlideDustEvent : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         dust.Stop();
+        AudioManager.instance.DisableSlide();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

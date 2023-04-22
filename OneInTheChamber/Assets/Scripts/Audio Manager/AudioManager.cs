@@ -13,8 +13,10 @@ public class AudioManager : MonoBehaviour
 
     public AudioSource sfxSource;
     public AudioSource musicSource;
+    public AudioSource slideSource;
 
     private AudioLowPassFilter musicLowPassFilter;
+    private float slideVolume;
 
     public void Awake()
     {
@@ -31,6 +33,8 @@ public class AudioManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         musicLowPassFilter = musicSource.gameObject.GetComponent<AudioLowPassFilter>();
+        slideVolume = slideSource.volume;
+        slideSource.volume = 0f;
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -44,6 +48,30 @@ public class AudioManager : MonoBehaviour
                 sfxSource.PlayOneShot(soundEffect.audioClip, soundEffect.volume);
             }
         }
+    }
+
+    public void EnableSlide()
+    {
+        StopCoroutine("SlideLevel");
+        StartCoroutine(SlideLevel(slideSource.volume, slideVolume, 0.1f));
+    }
+
+    public void DisableSlide()
+    {
+        StopCoroutine("SlideLevel");
+        StartCoroutine(SlideLevel(slideSource.volume, 0f, 0.1f));
+    }
+
+    private IEnumerator SlideLevel(float startVolume, float targetVolume, float duration)
+    {
+        float time = 0f;
+        while (time < duration)
+        {
+            slideSource.volume = Mathf.Lerp(startVolume, targetVolume, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        slideSource.volume = targetVolume;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
