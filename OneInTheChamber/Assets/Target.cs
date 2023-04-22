@@ -38,7 +38,9 @@ public class Target : MonoBehaviour
     IEnumerator ShatterRoutine()
     {
         animator.Play("Shatter");
-        yield return new WaitForSeconds(1f);
+        Time.timeScale = 0f;
+        yield return new WaitForSecondsRealtime(.5f);
+        Time.timeScale = 1f;
         GameObject.Find("LevelManager").GetComponent<LevelManager>().Win();
     }
 }
