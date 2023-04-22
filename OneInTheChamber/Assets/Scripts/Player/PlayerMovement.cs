@@ -649,6 +649,7 @@ public class PlayerMovement : MonoBehaviour
             rbody.velocity = new Vector2(rbody.velocity.x, strength);
             canBlast = true;
             coyoteTime = false;
+            AudioManager.instance.PlaySFX("Bounce");
         }
     }
 
