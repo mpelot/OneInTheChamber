@@ -45,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletTimeSlowdownFactor;
     public Animator aimEffectAnimator;
     public bool canBlast = true;
+    public bool canShoot = true;
     LaserGuide laserGuide;
     public ParticleSystem blastTrail;
     public ParticleSystem jumpDust;
@@ -272,7 +273,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Shooting
-        if (Input.GetMouseButtonDown(1) && !shooting)
+        if (Input.GetMouseButtonDown(1) && !shooting && canShoot)
         {
             playerState = State.inAir;
             animator.SetBool("Wallclinging", false);
@@ -306,6 +307,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (bulletTimeTimer < 0)
         {
+            canShoot = false;
             shooting = false;
             animator.SetBool("Aiming", false);
 
