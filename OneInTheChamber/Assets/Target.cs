@@ -6,6 +6,7 @@ public class Target : MonoBehaviour
 {
     public TargetGuide tg;
     private Renderer r;
+    private Animator animator;
 
     private void Start()
     {
@@ -14,6 +15,7 @@ public class Target : MonoBehaviour
         r = GetComponent<Renderer>();
         if (r.isVisible)
             OnBecameInvisible();
+        animator = GetComponent<Animator>();
     }
 
     private void OnBecameVisible()
@@ -30,6 +32,13 @@ public class Target : MonoBehaviour
 
     public void Shatter()
     {
+        StartCoroutine(ShatterRoutine());
+    }
+
+    IEnumerator ShatterRoutine()
+    {
+        animator.Play("Shatter");
+        yield return new WaitForSeconds(1f);
         GameObject.Find("LevelManager").GetComponent<LevelManager>().Win();
     }
 }
