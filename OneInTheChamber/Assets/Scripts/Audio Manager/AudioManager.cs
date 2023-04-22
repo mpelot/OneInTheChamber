@@ -82,6 +82,7 @@ public class AudioManager : MonoBehaviour
             {
                 if (musicSource.clip == musicTrack.audioClip)
                 {
+                    musicLowPassFilter.cutoffFrequency = 22000f;
                     return;
                 }
                 musicSource.Stop();
@@ -92,7 +93,7 @@ public class AudioManager : MonoBehaviour
             }
         }
     }
-    private IEnumerator SweepLPF(float startFrequency, float targetFrequency, float duration)
+    public IEnumerator SweepLPF(float startFrequency, float targetFrequency, float duration)
     {
         float time = 0f;
         while (time < duration)

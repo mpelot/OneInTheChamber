@@ -38,6 +38,7 @@ public class Target : MonoBehaviour
     IEnumerator ShatterRoutine()
     {
         AudioManager.instance.PlaySFX("Target Break");
+        StartCoroutine(AudioManager.instance.SweepLPF(6000f, 10f, 0.3f));
         animator.Play("Shatter");
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(.5f);
