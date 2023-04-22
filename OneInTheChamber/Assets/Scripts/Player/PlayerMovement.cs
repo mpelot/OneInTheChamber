@@ -42,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
     public float bulletTimeLength;
     public float blastCooldownTime;
     public float bulletTimeSlowdownFactor;
-    public Animator bulletTimeIndicatorAnimator;
+    public Animator aimEffectAnimator;
     public bool canBlast = true;
     LaserGuide laserGuide;
     public ParticleSystem blastTrail;
@@ -179,6 +179,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("BW Blast", false);
         animator.SetBool("FW Blast", false);
         ssAnimator.SetBool("Squash", false);
+        aimEffectAnimator.SetBool("AimEffect", false);
 
         if (Input.GetMouseButtonDown(0) && canBlast && blastCoolDownTimer <= 0)
         {
@@ -278,6 +279,7 @@ public class PlayerMovement : MonoBehaviour
             canBlast = false;
 
             animator.SetBool("Aiming", true);
+            aimEffectAnimator.SetBool("AimEffect", true);
 
             // Start bullet time timer
             bulletTimeTimer = bulletTimeLength;
@@ -285,7 +287,6 @@ public class PlayerMovement : MonoBehaviour
             // Set time scale to the slowdown factor
             Time.timeScale = bulletTimeSlowdownFactor;
             Time.fixedDeltaTime = Time.timeScale * .02f;
-            bulletTimeIndicatorAnimator.SetBool("BulletTime", true);
         }
         if (shooting) {
             Vector2 laserDirection = getVectorFromPlayerToMouse();
@@ -318,7 +319,7 @@ public class PlayerMovement : MonoBehaviour
             longJump = false;
 
             laserGuide.hideLaser();
-            bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
+            //bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
 
             // Reset bullet time parameters
             bulletTimeTimer = 0;
