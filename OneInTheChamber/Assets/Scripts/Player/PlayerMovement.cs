@@ -422,6 +422,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("Grounded", true);
                 ssAnimator.SetBool("Land", true);
                 landDust.Play();
+                AudioManager.instance.PlaySFX("Land");
             }
             //WallCling Transition
             else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
@@ -439,6 +440,12 @@ public class PlayerMovement : MonoBehaviour
                         rbody.gravityScale = 0f;
                         rbody.velocity = Vector2.zero;
                     }
+
+                    if (Mathf.Abs(lastSpeed) > maxRunSpeed * 1.5f)
+                    {
+                        AudioManager.instance.PlaySFX("Splat");
+                    }
+                    
                 } else
                 {
                     rbody.gravityScale = wallGravity;
@@ -643,6 +650,7 @@ public class PlayerMovement : MonoBehaviour
             rbody.velocity = new Vector2(rbody.velocity.x, strength);
             canBlast = true;
             coyoteTime = false;
+            AudioManager.instance.PlaySFX("Bounce");
         }
     }
 
