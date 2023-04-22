@@ -5125,6 +5125,7 @@ MonoBehaviour:
   jumpForce: 7
   coyoteTimeLength: 0.06
   inputBufferLength: 0.1
+  lRInputBufferLength: 0.3
   jumpCooldownLength: 0.4
   defaultGravity: 2
   longJumpGravity: 1.75
@@ -5157,6 +5158,8 @@ MonoBehaviour:
     m_Bits: 128
   ssAnimator: {fileID: 5631376533816099083}
   facingRight: 1
+  lInputBufferTimer: 0
+  rInputBufferTimer: 0
   lastSpeed: 0
 --- !u!50 &2861250680605902038
 Rigidbody2D:

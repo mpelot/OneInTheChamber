@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     public float coyoteTimeLength;
     public float inputBufferLength;
+    public float lRInputBufferLength;
     public float jumpCooldownLength;
     public float defaultGravity;
     public float longJumpGravity;
@@ -65,6 +66,8 @@ public class PlayerMovement : MonoBehaviour
     private float coyoteTimer = 0;
     private bool coyoteTime = false;
     private float inputBufferTimer = 0;
+    public float lInputBufferTimer = 0;
+    public float rInputBufferTimer = 0;
     private float jumpCooldownTimer = 0;
     private float wallSplatTimer = 0;
     private float wallStickTimer = 0;
@@ -333,6 +336,16 @@ public class PlayerMovement : MonoBehaviour
             // Reload Scene
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+
+        //L And R Input Buffer
+        if (Input.GetAxisRaw("Horizontal") < 0)
+        {
+            lInputBufferTimer = lRInputBufferLength;
+        }
+        else if (Input.GetAxisRaw("Horizontal") > 0)
+        {
+            rInputBufferTimer = lRInputBufferLength;
+        }
     }
 
     void FixedUpdate()
@@ -425,9 +438,10 @@ public class PlayerMovement : MonoBehaviour
                 AudioManager.instance.PlaySFX("Land");
             }
             //WallCling Transition
-            else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
+            else if(isOnWall() && (holdingForward || (!holdingForward && facingRight && rInputBufferTimer > 0) || (!holdingForward && !facingRight && lInputBufferTimer > 0)) && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
+                wallStickTimer = wallStickTime;
                 animator.SetBool("Wallclinging", true);
                 if (rbody.velocity.y > trueMaxSpeed.y)
                     rbody.velocity = new Vector2(rbody.velocity.x, trueMaxSpeed.y);
@@ -554,6 +568,10 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimer -= Time.fixedDeltaTime;
         if (inputBufferTimer > 0)
             inputBufferTimer -= Time.fixedDeltaTime;
+        if (lInputBufferTimer > 0)
+            lInputBufferTimer -= Time.fixedDeltaTime;
+        if (rInputBufferTimer > 0)
+            rInputBufferTimer -= Time.fixedDeltaTime;
         if (jumpCooldownTimer > 0)
             jumpCooldownTimer -= Time.fixedDeltaTime;
         if (wallStickTimer > 0)
