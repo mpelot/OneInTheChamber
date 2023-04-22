@@ -445,7 +445,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("Wallclinging", true);
                 if (rbody.velocity.y > trueMaxSpeed.y)
                     rbody.velocity = new Vector2(rbody.velocity.x, trueMaxSpeed.y);
-                if (Mathf.Abs(lastSpeed) > maxRunSpeed && rbody.velocity.y < trueMaxSpeed.y)
+                if (Mathf.Abs(lastSpeed) > maxRunSpeed)
                 {
                     ssAnimator.SetBool("WallSplat", true);
                     wallSplatTimer = wallSplatTime;
