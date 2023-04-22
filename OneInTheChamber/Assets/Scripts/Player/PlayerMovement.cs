@@ -595,7 +595,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnWall()
     {
         Vector2 dir = facingRight ? Vector2.right : Vector2.left;
-        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .5f) , 0f, dir, .02f, groundLayer);
+        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .5f) , 0f, dir, .04f, groundLayer);
     }
 
     private void Flip()
