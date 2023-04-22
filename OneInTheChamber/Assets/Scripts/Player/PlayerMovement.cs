@@ -329,6 +329,8 @@ public class PlayerMovement : MonoBehaviour
             // Reset the time scale
             Time.timeScale = 1;
             Time.fixedDeltaTime = .02f;
+
+            AudioManager.instance.PlaySFX("Laser Blast");
         }
 
         if (Input.GetKeyDown(KeyCode.R))
