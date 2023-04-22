@@ -9,21 +9,33 @@ public class LevelManager : MonoBehaviour
     public float timer;
     public string nextScene;
     private TextMeshProUGUI timerText;
+    private bool timerEnabled;
     // Start is called before the first frame update
     void Start()
     {
+        timerEnabled = timer > 0;
         timerText = GetComponentInChildren<TextMeshProUGUI>();
-        timerText.text = ((int)timer).ToString("D2") + ":" + ((int)(timer % 1 * 100)).ToString("D2");
+        if (timerEnabled)
+        {
+            timerText.text = ((int)timer).ToString("D2") + ":" + ((int)(timer % 1 * 100)).ToString("D2");
+        }
+        else
+        {
+            timerText.enabled = false;
+        }
         Time.timeScale = 1f;
     }
 
     private void Update()
     {
-        timer -= Time.deltaTime;
-        timerText.text = ((int)timer).ToString("D2") + ":" + ((int)(timer % 1 * 100)).ToString("D2");
-        if(timer <= 0)
+        if (timerEnabled)
         {
-            Lose();
+            timer -= Time.deltaTime;
+            timerText.text = ((int)timer).ToString("D2") + ":" + ((int)(timer % 1 * 100)).ToString("D2");
+            if (timer <= 0)
+            {
+                Lose();
+            }
         }
     }
 

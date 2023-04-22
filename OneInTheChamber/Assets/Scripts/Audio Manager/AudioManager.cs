@@ -16,6 +16,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource slideSource;
 
     private AudioLowPassFilter musicLowPassFilter;
+    private float musicVolume;
     private float slideVolume;
 
     public void Awake()
@@ -33,6 +34,7 @@ public class AudioManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         musicLowPassFilter = musicSource.gameObject.GetComponent<AudioLowPassFilter>();
+        musicVolume = musicSource.volume;
         slideVolume = slideSource.volume;
         slideSource.volume = 0f;
 
@@ -88,7 +90,7 @@ public class AudioManager : MonoBehaviour
                 }
                 musicSource.Stop();
                 musicSource.clip = musicTrack.audioClip;
-                musicSource.volume = musicTrack.volume;
+                musicSource.volume = musicTrack.volume * musicVolume;
                 StartCoroutine(SweepLPF(10f, 22000f, 2f));
                 musicSource.Play();
                 return;
