@@ -200,6 +200,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2240345805026789524, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
+      propertyPath: timer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2240345805026789525, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
       propertyPath: m_Name
       value: LevelManager

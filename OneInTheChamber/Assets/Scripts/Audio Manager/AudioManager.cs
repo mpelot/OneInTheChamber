@@ -82,6 +82,7 @@ public class AudioManager : MonoBehaviour
             {
                 if (musicSource.clip == musicTrack.audioClip)
                 {
+                    StopCoroutine("SweepLPF");
                     musicLowPassFilter.cutoffFrequency = 22000f;
                     return;
                 }
@@ -90,8 +91,13 @@ public class AudioManager : MonoBehaviour
                 musicSource.volume = musicTrack.volume;
                 StartCoroutine(SweepLPF(10f, 22000f, 2f));
                 musicSource.Play();
+                return;
             }
         }
+        Debug.LogWarning("No music track found for scene " + scene.name);
+        StopCoroutine("SweepLPF");
+        musicLowPassFilter.cutoffFrequency = 22000f;
+        return;
     }
     public IEnumerator SweepLPF(float startFrequency, float targetFrequency, float duration)
     {

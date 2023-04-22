@@ -188,6 +188,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2240345805026789524, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
+      propertyPath: timer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2240345805026789524, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
       propertyPath: nextScene
       value: Louis Level 8
       objectReference: {fileID: 0}
@@ -52925,18 +52929,6 @@ PrefabInstance:
     - target: {fileID: 6192224490664592265, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6192224490664592266, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
-      propertyPath: musicTracks.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6192224490664592266, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
-      propertyPath: musicTracks.Array.data[3].audioClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
-    - target: {fileID: 6192224490664592266, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
-      propertyPath: musicTracks.Array.data[3].sceneName
-      value: Max Level 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8bc8494f502507449aa46dd059a75ba, type: 3}
