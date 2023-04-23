@@ -354,15 +354,6 @@ MonoBehaviour:
   - sceneName: Louis Level 6
     audioClip: {fileID: 8300000, guid: 535600a5aebb37948b964217191e224a, type: 3}
     volume: 0.36
-  - sceneName: Max Level 2
-    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
-    volume: 0.24
-  - sceneName: Louis Level 8
-    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
-    volume: 0.24
-  - sceneName: Max Level 1
-    audioClip: {fileID: 8300000, guid: 535600a5aebb37948b964217191e224a, type: 3}
-    volume: 0.36
   - sceneName: Tutorial 1
     audioClip: {fileID: 8300000, guid: b1699268fb0954e4fa5ee0303b98c77f, type: 3}
     volume: 0.72
@@ -381,6 +372,21 @@ MonoBehaviour:
   - sceneName: Tutorial 7
     audioClip: {fileID: 8300000, guid: fde4b0388403f944ab954e17b780c77f, type: 3}
     volume: 0.72
+  - sceneName: Max Level 1
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
+    volume: 0.24
+  - sceneName: Louis Level 8
+    audioClip: {fileID: 8300000, guid: 438d8c9df48c39c4bb29a5e3310ba939, type: 3}
+    volume: 0.24
+  - sceneName: Max Level 2
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.36
+  - sceneName: Max Level 3
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.36
+  - sceneName: Max Level 4
+    audioClip: {fileID: 8300000, guid: 9aaa622a48926c74b9d43c1496e244fd, type: 3}
+    volume: 0.24
   sfxSource: {fileID: 787049501645648840}
   musicSource: {fileID: 709361881745791538}
   slideSource: {fileID: 5448735954692442499}
