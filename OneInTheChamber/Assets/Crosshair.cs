@@ -16,8 +16,7 @@ public class Crosshair : MonoBehaviour
     void Update()
     {
         Vector3 mousePos = Input.mousePosition;
-        // z needs to be nonzero for this to work
-        mousePos.z = cam.nearClipPlane;
+        mousePos.z = 10;
         transform.position = cam.ScreenToWorldPoint(mousePos);
     }
 }
