@@ -18,9 +18,17 @@ public class BulletPhysics : MonoBehaviour
     {
         hitG = Physics2D.Raycast(transform.position, movAngle, 1000, ground);
         RaycastHit2D hitT = Physics2D.Raycast(transform.position, movAngle, 1000, target);
-        if(hitT.collider != null && hitT.collider.gameObject.tag == "Target")
+        if(hitT.collider != null)
         {
-            hitT.collider.gameObject.GetComponent<Target>().Shatter();
+            if (hitT.collider.gameObject.tag == "Target")
+            {
+                hitT.collider.gameObject.GetComponent<Target>().Shatter();
+            }
+            else
+            {
+                FindObjectOfType<LevelManager>().Lose();
+            }
+            
         }
         StartCoroutine(DieCoroutine());
         GetComponent<TrailRenderer>().endColor = new Color(1, 1, 1, 0);
