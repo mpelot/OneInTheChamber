@@ -13,6 +13,13 @@ public class Laser : MonoBehaviour
     void Start()
     {
         StartCoroutine(SpawnLasers());
+        // There has to be a better way to do this
+        if (currentDirection == Direction.Left)
+            transform.rotation = Quaternion.Euler(0, 0, 180);
+        else if (currentDirection == Direction.Up)
+            transform.rotation = Quaternion.Euler(0, 0, 90);
+        else if (currentDirection == Direction.Down)
+            transform.rotation = Quaternion.Euler(0, 0, -90);
     }
 
     private IEnumerator SpawnLasers()

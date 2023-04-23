@@ -5140,11 +5140,12 @@ MonoBehaviour:
   yBlastTime: 0.2
   bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
   bulletForce: 8
-  bulletTimeLength: 0.5
+  bulletTimeLength: 0.7
   blastCooldownTime: 1
-  bulletTimeSlowdownFactor: 0.25
+  bulletTimeSlowdownFactor: 0.15
   aimEffectAnimator: {fileID: 3022594834219627877}
   canBlast: 1
+  canShoot: 1
   blastTrail: {fileID: 4963120889006692333}
   jumpDust: {fileID: 8836952792229693368}
   wallJumpDust: {fileID: 2551223209336459298}
