@@ -260,15 +260,8 @@ public class PlayerMovement : MonoBehaviour
 
                 // Play particle effect
                 blastTrail.Play();
-
-                try
-                {
-                    AudioManager.instance.PlaySFX("Blast");
-                }
-                catch (NullReferenceException)
-                {
-                    Debug.LogError("AudioManager not found.");
-                }
+                
+                AudioManager.instance.PlaySFX("Blast");
             }
         }
 
@@ -620,14 +613,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Grounded", false);   // Just trust me bro
         ssAnimator.SetBool("Stretch", true);
         jumpDust.Play();
-        try
-        {
-            AudioManager.instance.PlaySFX("Jump");
-        } 
-        catch (NullReferenceException)
-        {
-            Debug.LogError("AudioManager not found");
-        }
+        AudioManager.instance.PlaySFX("Jump");
     }
 
     private void WallJump()
@@ -653,15 +639,8 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Wallclinging", false);
         playerState = State.inAir;
         Flip();
-
-        try
-        {
-            AudioManager.instance.PlaySFX("Jump");
-        }
-        catch (NullReferenceException)
-        {
-            Debug.LogError("AudioManager not found");
-        }
+        
+        AudioManager.instance.PlaySFX("Jump");
     }
 
     public void Bounce(float strength)

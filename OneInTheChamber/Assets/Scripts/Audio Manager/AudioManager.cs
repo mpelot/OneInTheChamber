@@ -7,6 +7,17 @@ using UnityEngine.SceneManagement;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
+    private static AudioManager _instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                Debug.LogError("No AudioManager found in the scene.");
+            }
+            return instance;
+        }
+    }
 
     public List<SoundEffect> soundEffects = new List<SoundEffect>();
     public List<MusicTrack> musicTracks = new List<MusicTrack>();
