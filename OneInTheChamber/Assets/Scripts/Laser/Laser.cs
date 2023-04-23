@@ -9,17 +9,18 @@ public class Laser : MonoBehaviour
     public float cooldownTime = 1f;
     public float shootTime = 1f;
     public GameObject laserBeam;
+    public GameObject sprite;
     // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(SpawnLasers());
         // There has to be a better way to do this
         if (currentDirection == Direction.Left)
-            transform.rotation = Quaternion.Euler(0, 0, 180);
+            sprite.transform.rotation = Quaternion.Euler(0, 0, 180);
         else if (currentDirection == Direction.Up)
-            transform.rotation = Quaternion.Euler(0, 0, 90);
+            sprite.transform.rotation = Quaternion.Euler(0, 0, 90);
         else if (currentDirection == Direction.Down)
-            transform.rotation = Quaternion.Euler(0, 0, -90);
+            sprite.transform.rotation = Quaternion.Euler(0, 0, -90);
     }
 
     private IEnumerator SpawnLasers()

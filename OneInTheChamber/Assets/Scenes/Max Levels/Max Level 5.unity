@@ -25563,6 +25563,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6152856193908617400, guid: e1d19e086b5bec24493efdd2e30d0ddb, type: 3}
+      propertyPath: currentDirection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6152856193908617402, guid: e1d19e086b5bec24493efdd2e30d0ddb, type: 3}
       propertyPath: m_SortingLayer
       value: 3
