@@ -21,6 +21,10 @@ public class Laser : MonoBehaviour
         {
             yield return new WaitForSeconds(cooldownTime);
             GameObject currentBeam = Instantiate(laserBeam, transform);
+            if(cooldownTime == 0)
+            {
+                break;
+            }
             yield return new WaitForSeconds(shootTime);
         }
     }

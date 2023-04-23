@@ -15,6 +15,7 @@ public class LaserBeam : MonoBehaviour
     {
 
         lrender = GetComponent<LineRenderer>();
+        lrender.useWorldSpace = false;
         bCollide = GetComponent<BoxCollider2D>();
         currentDirection = (Direction)transform.parent.gameObject.GetComponent<Laser>().currentDirection;
         switch(currentDirection)
@@ -33,7 +34,10 @@ public class LaserBeam : MonoBehaviour
                 break;
         }
         lMask = LayerMask.GetMask("Ground");
-        StartCoroutine(KillTime());
+        if(transform.parent.gameObject.GetComponent<Laser>().cooldownTime != 0)
+        { 
+            StartCoroutine(KillTime());
+        }
     }
 
     // Update is called once per frame
