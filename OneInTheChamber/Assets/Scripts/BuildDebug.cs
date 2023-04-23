@@ -6,22 +6,20 @@ public class BuildDebug : MonoBehaviour
 {
     uint qsize = 15;  // number of messages to keep
     Queue myLogQueue = new Queue();
-    public bool isDebug = false;
+    public bool showLog = false;
 
     void Start()
     {
-        if (isDebug)
-        {
-            DontDestroyOnLoad(this.gameObject);
-            
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+        DontDestroyOnLoad(this.gameObject);
         Debug.Log("Started up logging.");
+    }
 
-        
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            showLog = !showLog;
+        }
     }
 
     void OnEnable()
@@ -45,8 +43,11 @@ public class BuildDebug : MonoBehaviour
 
     void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(Screen.width - 400, 0, 400, Screen.height));
-        GUILayout.Label("\n" + string.Join("\n", myLogQueue.ToArray()));
-        GUILayout.EndArea();
+        if (showLog)
+        {
+            GUILayout.BeginArea(new Rect(Screen.width - 400, 0, 400, Screen.height));
+            GUILayout.Label("\n" + string.Join("\n", myLogQueue.ToArray()));
+            GUILayout.EndArea();
+        }
     }
 }
