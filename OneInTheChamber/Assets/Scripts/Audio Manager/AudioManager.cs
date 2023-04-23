@@ -6,16 +6,20 @@ using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager instance;
-    private static AudioManager _instance
+    private static AudioManager _instance;
+    public static AudioManager instance
     {
         get
         {
-            if (instance == null)
+            if (_instance == null)
             {
                 Debug.LogError("No AudioManager found in the scene.");
             }
-            return instance;
+            return _instance;
+        }
+        private set
+        {
+            _instance = value;
         }
     }
 
