@@ -204,6 +204,10 @@ PrefabInstance:
       propertyPath: timer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 2240345805026789524, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
+      propertyPath: nextScene
+      value: Louis Level 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2240345805026789525, guid: 2f61ca09a9fe7834f8aee4f1992b0a3a, type: 3}
       propertyPath: m_Name
       value: LevelManager
@@ -98147,7 +98151,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7094998732382184207, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
       propertyPath: orthographic size
-      value: 7.5
+      value: 9.458333
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}

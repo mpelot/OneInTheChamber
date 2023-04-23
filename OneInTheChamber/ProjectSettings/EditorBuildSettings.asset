@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 1
+    path: Assets/Scenes/Main Menu.unity
+    guid: 6d4ed4094f88ff240bf24a409bbedbd2
+  - enabled: 1
     path: Assets/Scenes/Demo Levels/Max Level 1.unity
     guid: 4d2184b7d8baf3c48a976ab277e9d863
   - enabled: 1
@@ -38,4 +41,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Demo Levels/Louis Level 8.unity
     guid: 899fa61c15f6c4043b0854fef338351a
+  - enabled: 1
+    path: Assets/Scenes/Max Levels/Max Level 3.unity
+    guid: 49058f77516f4834390ba1293e997f30
+  - enabled: 1
+    path: Assets/Scenes/Max Levels/Max Level 4.unity
+    guid: ae884bea84a8f1a4b97d272e19521801
+  - enabled: 1
+    path: Assets/Scenes/Louis Levels/Louis Level 5.unity
+    guid: 2e19111bc8943db46a7dbe1b9d2b8619
   m_configObjects: {}
