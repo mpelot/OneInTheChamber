@@ -107,10 +107,10 @@ MonoBehaviour:
   bounceLimit: 1
   ground:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 4224
   target:
     serializedVersion: 2
-    m_Bits: 2176
+    m_Bits: 6272
   blastParticles: {fileID: 934485827783583829, guid: 8d965d08dd72f6d499f6400d31d05ffd, type: 3}
 --- !u!50 &-4931415327569981390
 Rigidbody2D:

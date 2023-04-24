@@ -19,6 +19,7 @@ public class MovingPlatform : MonoBehaviour
     private float yDiff;
     private Vector2 lastPos;
     public bool attached = false;
+    private GameObject player;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,13 +31,14 @@ public class MovingPlatform : MonoBehaviour
         xDiff = endX - startX;
         yDiff = endY - startY;
         rbody = GetComponent<Rigidbody2D>();
+        player = GameObject.Find("Player");
     }
 
     private void Update()
     {
         if (attached && (rbody.velocity.y < 0 || rbody.velocity.x != 0))
         {
-            GameObject.Find("Player").transform.Translate(transform.position - (Vector3)lastPos);
+            player.transform.Translate(transform.position - (Vector3)lastPos);
         }
         lastPos = transform.position;
     }
@@ -57,7 +59,8 @@ public class MovingPlatform : MonoBehaviour
         if(collision.gameObject.tag == "Player")
         {
             attached = true;
-            collision.gameObject.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.None;
+            player.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.Extrapolate;
+            collision.gameObject.GetComponent<Rigidbody2D>().velocity -= rbody.velocity;
         }
     }
 

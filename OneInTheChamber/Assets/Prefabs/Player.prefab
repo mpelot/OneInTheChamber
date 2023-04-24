@@ -5157,6 +5157,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 128
+  groundAndPlatLayer:
+    serializedVersion: 2
+    m_Bits: 4224
   ssAnimator: {fileID: 5631376533816099083}
   facingRight: 1
   lInputBufferTimer: 0

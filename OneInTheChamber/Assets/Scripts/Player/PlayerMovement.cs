@@ -59,6 +59,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Ground Detection")]
     [SerializeField] BoxCollider2D coll;
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] LayerMask groundAndPlatLayer;
 
     private Rigidbody2D rbody;
     private Animator animator;
@@ -99,6 +100,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+
         // Update the speed parameter in the animator
         animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1, -1, 5));
 
@@ -585,7 +587,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded()
     {
-        return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .02f, groundLayer);
+        return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .02f, groundAndPlatLayer);
     }
     private bool isOnWall()
     {
