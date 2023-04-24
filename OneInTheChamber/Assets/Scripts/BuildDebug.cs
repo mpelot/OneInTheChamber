@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class BuildDebug : MonoBehaviour
 {
-    uint qsize = 15;  // number of messages to keep
+    int qsize = 15;  // number of messages to keep
     Queue myLogQueue = new Queue();
+
+    int frameCounter = 0;
+    float timeCounter = 0.0f;
+    float lastFramerate = 0.0f;
+
     public bool showLog = false;
+    public float refreshTime = 0.5f;
 
     void Start()
     {
@@ -19,6 +25,21 @@ public class BuildDebug : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
         {
             showLog = !showLog;
+        }
+        
+        if (showLog)
+        {
+            if (timeCounter < refreshTime)
+            {
+                timeCounter += Time.deltaTime;
+                frameCounter++;
+            }
+            else
+            {
+                lastFramerate = (float)frameCounter / timeCounter;
+                frameCounter = 0;
+                timeCounter = 0.0f;
+            }
         }
     }
 
@@ -46,7 +67,7 @@ public class BuildDebug : MonoBehaviour
         if (showLog)
         {
             GUILayout.BeginArea(new Rect(Screen.width - 400, 0, 400, Screen.height));
-            GUILayout.Label("\n" + string.Join("\n", myLogQueue.ToArray()));
+            GUILayout.Label("\nFPS:" + lastFramerate.ToString() + "\n" + string.Join("\n", myLogQueue.ToArray()));
             GUILayout.EndArea();
         }
     }
