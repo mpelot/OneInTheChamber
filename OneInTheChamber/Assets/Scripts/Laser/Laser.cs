@@ -6,6 +6,7 @@ public class Laser : MonoBehaviour
 {
     public enum Direction {Left, Right, Up, Down};
     public Direction currentDirection = Direction.Left;
+    public float initialDelay = 0f;
     public float cooldownTime = 1f;
     public float shootTime = 1f;
     public GameObject laserBeam;
@@ -25,15 +26,16 @@ public class Laser : MonoBehaviour
 
     private IEnumerator SpawnLasers()
     {
+        yield return new WaitForSeconds(initialDelay);
         while(true)
         {
-            yield return new WaitForSeconds(cooldownTime);
             GameObject currentBeam = Instantiate(laserBeam, transform);
             if(cooldownTime == 0)
             {
                 break;
             }
             yield return new WaitForSeconds(shootTime);
+            yield return new WaitForSeconds(cooldownTime);
         }
     }
 

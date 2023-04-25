@@ -63,11 +63,20 @@ public class LaserBeam : MonoBehaviour
                 bCollide.offset = new Vector2(0, distance / 2);
             }
         }
+        lrender.sortingOrder = (int)transform.position.y;
     }
 
     private IEnumerator KillTime()
     {
         yield return new WaitForSeconds(transform.parent.gameObject.GetComponent<Laser>().shootTime);
         Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.tag == "Player")
+        {
+            GameObject.Find("LevelManager").GetComponent<LevelManager>().Lose();
+        }
     }
 }

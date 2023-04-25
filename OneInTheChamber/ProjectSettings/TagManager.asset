@@ -54,6 +54,9 @@ TagManager:
   - name: Player
     uniqueID: 4048455867
     locked: 0
+  - name: Laser
+    uniqueID: 1907034687
+    locked: 0
   - name: Ground
     uniqueID: 2678218817
     locked: 0
