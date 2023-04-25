@@ -56,7 +56,7 @@ public class LevelManager : MonoBehaviour
         AudioManager.instance.PlaySFX("Target Break");
         StartCoroutine(AudioManager.instance.SweepLPF(6000f, 10f, 0.15f));
         GameObject.Find("Player").GetComponent<Animator>().Play("Death");
-        yield return new WaitForSecondsRealtime(.583f * 2);
+        yield return new WaitForSecondsRealtime(.583f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
     }
 
