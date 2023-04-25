@@ -8,9 +8,16 @@ public class LevelManager : MonoBehaviour
 {
     public float timer;
     public string nextScene;
+    public GameObject startingWhite;
     private TextMeshProUGUI timerText;
     private bool timerEnabled;
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        startingWhite.SetActive(true);
+    }
+
     void Start()
     {
         timerEnabled = timer > 0;
