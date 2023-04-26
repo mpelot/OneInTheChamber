@@ -11,6 +11,7 @@ public class LevelManager : MonoBehaviour
     public GameObject startingWhite;
     private TextMeshProUGUI timerText;
     private bool timerEnabled;
+    private bool dying = false;
     // Start is called before the first frame update
 
     private void Awake()
@@ -37,10 +38,14 @@ public class LevelManager : MonoBehaviour
     {
         if (timerEnabled)
         {
-            timer -= Time.deltaTime;
+            if(!dying && timer > 0)
+            {
+                timer -= Time.deltaTime;
+            }
             timerText.text = ((int)timer).ToString("D2") + ":" + ((int)(timer % 1 * 100)).ToString("D2");
             if (timer <= 0)
             {
+                timer = 0;
                 Lose();
             }
         }
@@ -48,11 +53,18 @@ public class LevelManager : MonoBehaviour
 
     public void Lose()
     {
-		StartCoroutine(DeathRoutine());
+        if(!dying)
+        {
+            dying = true;
+            StartCoroutine(DeathRoutine());
+        }
     }
 	
 	IEnumerator DeathRoutine()
     {
+        GameObject.Find("Player").GetComponent<PlayerMovement>().enabled = false;
+        GameObject.Find("Player").GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        GameObject.Find("Player").GetComponent<Rigidbody2D>().gravityScale = 0;
         AudioManager.instance.PlaySFX("Target Break");
         StartCoroutine(AudioManager.instance.SweepLPF(6000f, 10f, 0.15f));
         GameObject.Find("Player").GetComponent<Animator>().Play("Death");
