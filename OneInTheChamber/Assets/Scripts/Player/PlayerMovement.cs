@@ -102,7 +102,14 @@ public class PlayerMovement : MonoBehaviour
     {
 
         // Update the speed parameter in the animator
-        animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x-platformVelocity.x)-.1f) + 1f, -1, 5));
+        if(platformVelocity.x != 0)
+        {
+            animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x - platformVelocity.x) - .1f) + 1f, -1, 5));
+        }
+        else
+        {
+            animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1f, -1, 5));
+        }
 
         // Update the vertical velocity parameter in the animator
         animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y-platformVelocity.y, -5, 5));
