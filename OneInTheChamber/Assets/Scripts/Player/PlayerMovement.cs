@@ -121,7 +121,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Update the moving backwards paramater in the animator
-        if (transform.localScale.x * (rbody.velocity.x - rbody.velocity.x) < 0)
+        if (transform.localScale.x * rbody.velocity.x < 0)
         {
             animator.SetBool("Moving Backwards", true);
         }
