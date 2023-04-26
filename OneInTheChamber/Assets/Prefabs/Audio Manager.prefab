@@ -387,6 +387,27 @@ MonoBehaviour:
   - sceneName: Max Level 4
     audioClip: {fileID: 8300000, guid: 9aaa622a48926c74b9d43c1496e244fd, type: 3}
     volume: 0.48
+  - sceneName: Main Menu
+    audioClip: {fileID: 8300000, guid: f699031b2dc553f40adf4c0124eebf1c, type: 3}
+    volume: 0.48
+  - sceneName: Max Level 5
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
+  - sceneName: Max Level 6
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
+  - sceneName: Jack Level 1
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
+  - sceneName: Jack Level 2
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
+  - sceneName: Jack Level 3
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
+  - sceneName: Jasmine Level 3
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
   sfxSource: {fileID: 787049501645648840}
   musicSource: {fileID: 709361881745791538}
   slideSource: {fileID: 5448735954692442499}
