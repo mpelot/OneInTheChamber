@@ -386,7 +386,7 @@ MonoBehaviour:
     volume: 0.36
   - sceneName: Max Level 4
     audioClip: {fileID: 8300000, guid: 9aaa622a48926c74b9d43c1496e244fd, type: 3}
-    volume: 0.24
+    volume: 0.48
   sfxSource: {fileID: 787049501645648840}
   musicSource: {fileID: 709361881745791538}
   slideSource: {fileID: 5448735954692442499}
