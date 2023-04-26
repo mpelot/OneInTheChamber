@@ -348,7 +348,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1616748479
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -32346,6 +32346,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+    - target: {fileID: 5570516204840428241, guid: 5b5c4c5c7919a12428624e1a81ea3036, type: 3}
+      propertyPath: playerTransform
+      value: 
+      objectReference: {fileID: 452228106}
     - target: {fileID: 5570516204840428243, guid: 5b5c4c5c7919a12428624e1a81ea3036, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -32450,6 +32454,10 @@ PrefabInstance:
     - target: {fileID: 7094998732382184206, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7094998732382184207, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
+      propertyPath: orthographic size
+      value: 7.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
