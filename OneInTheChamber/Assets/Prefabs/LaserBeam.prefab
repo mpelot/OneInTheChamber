@@ -173,6 +173,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentDirection: 0
+  lMask:
+    serializedVersion: 2
+    m_Bits: 4224
 --- !u!114 &2359438316662831954
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -49,6 +49,11 @@ public class LevelManager : MonoBehaviour
                 Lose();
             }
         }
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+            Destroy(GameObject.Find("Audio Manager"));
+        }
     }
 
     public void Lose()
@@ -74,6 +79,9 @@ public class LevelManager : MonoBehaviour
 
     public void Win()
     {
+        PlayerPrefs.SetString("CurrentScene", nextScene);
+        PlayerPrefs.Save();
         SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
     }
+
 }

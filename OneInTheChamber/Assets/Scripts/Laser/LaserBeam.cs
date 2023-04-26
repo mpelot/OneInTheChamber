@@ -9,7 +9,7 @@ public class LaserBeam : MonoBehaviour
     private Vector2 dirVector;
     private LineRenderer lrender;
     private BoxCollider2D bCollide;
-    private LayerMask lMask;
+    public LayerMask lMask;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,7 +33,6 @@ public class LaserBeam : MonoBehaviour
                 dirVector = Vector2.down;
                 break;
         }
-        lMask = LayerMask.GetMask("Ground");
         if(transform.parent.gameObject.GetComponent<Laser>().cooldownTime != 0)
         { 
             StartCoroutine(KillTime());
