@@ -36,11 +36,6 @@ public class MovingPlatform : MonoBehaviour
 
     private void Update()
     {
-        if (attached && (rbody.velocity.y < 0 || rbody.velocity.x != 0))
-        {
-            player.transform.Translate(transform.position - (Vector3)lastPos);
-        }
-        lastPos = transform.position;
     }
 
     void FixedUpdate()
@@ -52,6 +47,10 @@ public class MovingPlatform : MonoBehaviour
             transform.position = start;
         }
         rbody.velocity = new Vector2(Mathf.Sin(timer) * (xDiff / 2) * (2 * Mathf.PI) / time, Mathf.Sin(timer) * (yDiff / 2) * (2 * Mathf.PI) / time);
+        if (attached && (rbody.velocity.y < 0 || rbody.velocity.x != 0))
+        {
+            player.GetComponent<PlayerMovement>().platformVelocity = rbody.velocity;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -59,8 +58,8 @@ public class MovingPlatform : MonoBehaviour
         if(collision.gameObject.tag == "Player")
         {
             attached = true;
-            player.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.Extrapolate;
-            collision.gameObject.GetComponent<Rigidbody2D>().velocity -= rbody.velocity;
+            //player.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.Extrapolate;
+            //collision.gameObject.GetComponent<Rigidbody2D>().velocity -= rbody.velocity;
         }
     }
 
@@ -69,8 +68,9 @@ public class MovingPlatform : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             attached = false;
-            collision.gameObject.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.Interpolate;
-            collision.gameObject.GetComponent<Rigidbody2D>().velocity += rbody.velocity;
+            player.GetComponent<PlayerMovement>().platformVelocity = Vector2.zero;
+            //collision.gameObject.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.Interpolate;
+            //collision.gameObject.GetComponent<Rigidbody2D>().velocity += rbody.velocity;
         }
     }
 }

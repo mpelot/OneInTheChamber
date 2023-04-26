@@ -102,10 +102,10 @@ public class PlayerMovement : MonoBehaviour
     {
 
         // Update the speed parameter in the animator
-        animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1, -1, 5));
+        animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x-platformVelocity.x)) + 1, -1, 5));
 
         // Update the vertical velocity parameter in the animator
-        animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y, -5, 5));
+        animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y-platformVelocity.y, -5, 5));
 
         // If Turning
         if (((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) && playerState != State.wallCling)
@@ -114,7 +114,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Update the moving backwards paramater in the animator
-        if (transform.localScale.x * rbody.velocity.x < 0)
+        if (transform.localScale.x * (rbody.velocity.x - rbody.velocity.x) < 0)
         {
             animator.SetBool("Moving Backwards", true);
         }
@@ -556,7 +556,7 @@ public class PlayerMovement : MonoBehaviour
         goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
         if (playerState != State.wallCling)
         {
-            rbody.velocity = Vector2.MoveTowards(rbody.velocity, goalSpeed, accelValue * Time.fixedDeltaTime);
+            rbody.velocity = Vector2.MoveTowards(rbody.velocity-platformVelocity, goalSpeed, accelValue * Time.fixedDeltaTime) + platformVelocity;
         }
 
         // Update animation parameter
