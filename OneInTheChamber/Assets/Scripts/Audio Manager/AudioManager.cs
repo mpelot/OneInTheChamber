@@ -97,7 +97,7 @@ public class AudioManager : MonoBehaviour
         {
             if (musicTrack.sceneName.Equals(scene.name))
             {
-                if (musicSource.clip == musicTrack.audioClip)
+                if (musicSource != null && musicSource.clip == musicTrack.audioClip)
                 {
                     StopCoroutine("SweepLPF");
                     musicLowPassFilter.cutoffFrequency = 22000f;
