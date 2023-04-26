@@ -9,16 +9,14 @@ public class MenuButtons : MonoBehaviour
     
     public void StartButton()
     {
-        SceneManager.LoadScene("Tutorial 1", LoadSceneMode.Single);
-
-        /*if (PlayerPrefs.GetString("CurrentScene") == "" || PlayerPrefs.GetString("CurrentScene") == "Main Menu")
+        if(PlayerPrefs.GetString("CurrentScene") == "" || PlayerPrefs.GetString("CurrentScene") == "Main Menu")
         {
             SceneManager.LoadScene("Tutorial 1", LoadSceneMode.Single);
         }
         else
         {
             SceneManager.LoadScene(PlayerPrefs.GetString("CurrentScene"), LoadSceneMode.Single);
-        }*/
+        }
     }
 
     public void QuitButton()

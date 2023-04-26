@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Tutorial Levels/Tutorial 1.unity
     guid: 6f1ba59b05b10c24d86befd4cb72daac
   - enabled: 1
+    path: Assets/Scenes/Tutorial Levels/Tutorial 2(OLD).unity
+    guid: 6a783e9a27618f24bb09f63d100c3183
+  - enabled: 1
     path: Assets/Scenes/Tutorial Levels/Tutorial 3.unity
     guid: 22c2d4519b94da3488157890b655ff3c
   - enabled: 1
@@ -47,22 +50,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game Levels/Louis Level 5.unity
     guid: 2e19111bc8943db46a7dbe1b9d2b8619
-  - enabled: 1
-    path: Assets/Scenes/Game Levels/Jack Level 1.unity
-    guid: d7dc7fc6ad2a9214fb65be2f00d37b3a
-  - enabled: 1
-    path: Assets/Scenes/Game Levels/Jack Level 2.unity
-    guid: 7de5d20eaf451a240ae303595770778b
-  - enabled: 1
-    path: Assets/Scenes/Game Levels/Jack Level 3.unity
-    guid: 39f9eeb6cbe6b874c921e055d6757b93
-  - enabled: 1
-    path: Assets/Scenes/Game Levels/Jasmine Level 3.unity
-    guid: 99c9f65f54bd6774a836358c46119a92
-  - enabled: 1
-    path: Assets/Scenes/Game Levels/Max Level 5.unity
-    guid: 39ebf858b5a8ec241aefa9a5ce588028
-  - enabled: 1
-    path: Assets/Scenes/Game Levels/Max Level 6.unity
-    guid: 7f783e5f4bdaa554e809512dcab52758
   m_configObjects: {}
