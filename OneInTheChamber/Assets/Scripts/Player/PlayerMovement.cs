@@ -337,12 +337,6 @@ public class PlayerMovement : MonoBehaviour
             AudioManager.instance.PlaySFX("Laser Blast");
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            // Reload Scene
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-
         //L And R Input Buffer
         if (Input.GetAxisRaw("Horizontal") < 0)
         {

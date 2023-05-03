@@ -57,6 +57,12 @@ public class LevelManager : MonoBehaviour
             PlayerPrefs.Save();
             SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
         }
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            PlayerPrefs.SetFloat("GTime", global);
+            PlayerPrefs.Save();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
         global += Time.unscaledDeltaTime;
     }
 
