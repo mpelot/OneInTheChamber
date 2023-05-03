@@ -65,4 +65,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game Levels/Max Level 6.unity
     guid: 7f783e5f4bdaa554e809512dcab52758
+  - enabled: 1
+    path: Assets/Scenes/Victory Screen.unity
+    guid: 609af2afe8e06124895dca5a84449cac
   m_configObjects: {}

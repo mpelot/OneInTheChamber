@@ -9,8 +9,9 @@ public class MenuButtons : MonoBehaviour
     
     public void StartButton()
     {
-        if(PlayerPrefs.GetString("CurrentScene") == "" || PlayerPrefs.GetString("CurrentScene") == "Main Menu")
+        if(PlayerPrefs.GetString("CurrentScene") == "" || PlayerPrefs.GetString("CurrentScene") == "Main Menu" || PlayerPrefs.GetString("CurrentScene") == "Victory Screen")
         {
+            PlayerPrefs.SetFloat("GTime", 0);
             SceneManager.LoadScene("Tutorial 1", LoadSceneMode.Single);
         }
         else
@@ -24,11 +25,17 @@ public class MenuButtons : MonoBehaviour
         Application.Quit();
     }
 
+    public void MainMenu()
+    {
+        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+    }
+
     public void Update()
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
             PlayerPrefs.SetString("CurrentScene", "");
+            PlayerPrefs.SetFloat("GTime", 0);
             PlayerPrefs.Save();
             SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
         }

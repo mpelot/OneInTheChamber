@@ -7,6 +7,7 @@ using TMPro;
 public class LevelManager : MonoBehaviour
 {
     public float timer;
+    private float global;
     public string nextScene;
     public GameObject startingWhite;
     private TextMeshProUGUI timerText;
@@ -17,6 +18,7 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         startingWhite.SetActive(true);
+        global = PlayerPrefs.GetFloat("GTime");
     }
 
     void Start()
@@ -51,9 +53,11 @@ public class LevelManager : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Escape))
         {
+            PlayerPrefs.SetFloat("GTime", global);
+            PlayerPrefs.Save();
             SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
-            Destroy(GameObject.Find("Audio Manager"));
         }
+        global += Time.unscaledDeltaTime;
     }
 
     public void Lose()
@@ -74,12 +78,15 @@ public class LevelManager : MonoBehaviour
         StartCoroutine(AudioManager.instance.SweepLPF(6000f, 10f, 0.15f));
         GameObject.Find("Player").GetComponent<Animator>().Play("Death");
         yield return new WaitForSecondsRealtime(.583f);
+        PlayerPrefs.SetFloat("GTime", global);
+        PlayerPrefs.Save();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
     }
 
     public void Win()
     {
         PlayerPrefs.SetString("CurrentScene", nextScene);
+        PlayerPrefs.SetFloat("GTime", global);
         PlayerPrefs.Save();
         SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
     }

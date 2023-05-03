@@ -376,7 +376,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2134042497674032875, guid: e1d19e086b5bec24493efdd2e30d0ddb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6152856193908617400, guid: e1d19e086b5bec24493efdd2e30d0ddb, type: 3}
       propertyPath: shootTime
@@ -88788,7 +88788,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7094998732382184207, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}
       propertyPath: orthographic size
-      value: 5.2604165
+      value: 6.5625
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d73e501581414c458098a5b7845d6e1, type: 3}

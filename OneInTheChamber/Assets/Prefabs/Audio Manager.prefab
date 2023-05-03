@@ -408,6 +408,9 @@ MonoBehaviour:
   - sceneName: Jasmine Level 3
     audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
     volume: 0.48
+  - sceneName: Victory Screen
+    audioClip: {fileID: 8300000, guid: 05e2ef89498a42c4ba737f42d6851790, type: 3}
+    volume: 0.48
   sfxSource: {fileID: 787049501645648840}
   musicSource: {fileID: 709361881745791538}
   slideSource: {fileID: 5448735954692442499}
