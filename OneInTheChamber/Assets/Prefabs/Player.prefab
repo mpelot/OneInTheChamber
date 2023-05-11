@@ -5127,7 +5127,7 @@ MonoBehaviour:
   jumpForce: 7
   coyoteTimeLength: 0.06
   inputBufferLength: 0.1
-  lRInputBufferLength: 0.3
+  holdingForwardBufferLength: 0.1
   jumpCooldownLength: 0.4
   defaultGravity: 2
   longJumpGravity: 1.75
@@ -5164,8 +5164,6 @@ MonoBehaviour:
     m_Bits: 4224
   ssAnimator: {fileID: 5631376533816099083}
   facingRight: 1
-  lInputBufferTimer: 0
-  rInputBufferTimer: 0
   lastSpeed: 0
 --- !u!50 &2861250680605902038
 Rigidbody2D:
@@ -10472,8 +10470,8 @@ SpriteMask:
   m_MaskAlphaCutoff: 0.2
   m_FrontSortingLayerID: 1130558793
   m_BackSortingLayerID: 1130558793
-  m_FrontSortingLayer: 4
-  m_BackSortingLayer: 4
+  m_FrontSortingLayer: 5
+  m_BackSortingLayer: 5
   m_FrontSortingOrder: 3
   m_BackSortingOrder: 3
   m_IsCustomRangeActive: 0
@@ -10549,7 +10547,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1130558793
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 3
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

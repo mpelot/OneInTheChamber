@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     public float coyoteTimeLength;
     public float inputBufferLength;
-    public float lRInputBufferLength;
+    public float holdingForwardBufferLength;
     public float jumpCooldownLength;
     public float defaultGravity;
     public float longJumpGravity;
@@ -68,13 +68,12 @@ public class PlayerMovement : MonoBehaviour
     private float coyoteTimer = 0;
     private bool coyoteTime = false;
     private float inputBufferTimer = 0;
-    public float lInputBufferTimer = 0;
-    public float rInputBufferTimer = 0;
+    private float holdingForwardBufferTimer = 0;
     private float jumpCooldownTimer = 0;
     private float wallSplatTimer = 0;
     private float wallStickTimer = 0;
     private float yBlastTimer = 0;
-    private bool holdingForward = false;
+    public bool holdingForward = false;
     private float bulletTimeTimer = 0;
     private float blastCoolDownTimer = 0;
     private float currentMaxSpeed;
@@ -85,7 +84,6 @@ public class PlayerMovement : MonoBehaviour
     private bool shooting = false;
     private Camera mainCam;
     public float lastSpeed;
-    private Vector2 lastPlatformVelocity;
 
     void Start()
     {
@@ -131,7 +129,14 @@ public class PlayerMovement : MonoBehaviour
         }
         
         // Calulate if the player is holding in the direction they are facing
-        holdingForward = facingRight ? goalSpeed.x > 0 : goalSpeed.x < 0;
+        if ((facingRight && goalSpeed.x > 0) || (!facingRight && goalSpeed.x < 0))
+        {
+            holdingForward = true;
+            holdingForwardBufferTimer = holdingForwardBufferLength;
+        }
+
+        if (holdingForwardBufferTimer <= 0f)
+            holdingForward = false;
 
         ssAnimator.SetBool("Stretch", false);
 
@@ -336,16 +341,6 @@ public class PlayerMovement : MonoBehaviour
 
             AudioManager.instance.PlaySFX("Laser Blast");
         }
-
-        //L And R Input Buffer
-        if (Input.GetAxisRaw("Horizontal") < 0)
-        {
-            lInputBufferTimer = lRInputBufferLength;
-        }
-        else if (Input.GetAxisRaw("Horizontal") > 0)
-        {
-            rInputBufferTimer = lRInputBufferLength;
-        }
     }
 
     void FixedUpdate()
@@ -438,7 +433,7 @@ public class PlayerMovement : MonoBehaviour
                 AudioManager.instance.PlaySFX("Land");
             }
             //WallCling Transition
-            else if(isOnWall() && (holdingForward || (!holdingForward && facingRight && rInputBufferTimer > 0) || (!holdingForward && !facingRight && lInputBufferTimer > 0)) && Mathf.Abs(rbody.velocity.x) < 0.1f)
+            else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
                 playerState = State.wallCling;
                 wallStickTimer = wallStickTime;
@@ -459,12 +454,7 @@ public class PlayerMovement : MonoBehaviour
                     {
                         AudioManager.instance.PlaySFX("Splat");
                     }
-                    
-                } else
-                {
-                    rbody.gravityScale = wallGravity;
-                    rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * wallSpeedLoss);
-                }  
+                } 
             }
             else if(!(isOnWall() && holdingForward))
             {
@@ -505,10 +495,6 @@ public class PlayerMovement : MonoBehaviour
         // WALL CLING
         else if (playerState == State.wallCling)
         {
-            if(Mathf.Abs(lastSpeed) > 0)
-            {
-                //lastSpeed -= Mathf.Sign(lastSpeed) * wallSpeedDecay * Time.fixedDeltaTime;
-            } 
             if (holdingForward)
             {
                 wallStickTimer = wallStickTime;
@@ -517,7 +503,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 WallJump();
             }
-            if (wallSplatTimer <= 0)
+            if (wallSplatTimer <= 0 && rbody.velocity.y <= 0f)
             {
                 rbody.gravityScale = wallGravity;
                 lastSpeed = 0;
@@ -568,10 +554,8 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimer -= Time.fixedDeltaTime;
         if (inputBufferTimer > 0)
             inputBufferTimer -= Time.fixedDeltaTime;
-        if (lInputBufferTimer > 0)
-            lInputBufferTimer -= Time.fixedDeltaTime;
-        if (rInputBufferTimer > 0)
-            rInputBufferTimer -= Time.fixedDeltaTime;
+        if (holdingForwardBufferTimer > 0)
+            holdingForwardBufferTimer -= Time.fixedDeltaTime;
         if (jumpCooldownTimer > 0)
             jumpCooldownTimer -= Time.fixedDeltaTime;
         if (wallStickTimer > 0)
@@ -593,7 +577,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnWall()
     {
         Vector2 dir = facingRight ? Vector2.right : Vector2.left;
-        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .5f) , 0f, dir, .04f, groundLayer);
+        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .6f) , 0f, dir, .04f, groundLayer);
     }
 
     private void Flip()
@@ -671,6 +655,6 @@ public class PlayerMovement : MonoBehaviour
         // Revert z transform
         norm.z = 0;
 
-        return (Vector2)(norm - transform.position).normalized;
+        return (norm - transform.position).normalized;
     }
 }
