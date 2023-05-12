@@ -198,7 +198,7 @@ public class PlayerMovement : MonoBehaviour
             Vector2 laserDirection = getVectorFromPlayerToMouse();
             animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
             spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
-            setLaserDirection(laserDirection);
+            SetLaserDirection(laserDirection);
             laserGuide.enabled = true;
         }
 
@@ -285,8 +285,9 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
+            bool groundCheck = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - .5f), Vector2.down, .1f, groundLayer);
             //GROUND Transtion
-            if (isGrounded())
+            if (isGrounded() && !(isOnWall() && !groundCheck))
             {
                 canBlast = true;
                 coyoteTime = true;
@@ -592,23 +593,19 @@ public class PlayerMovement : MonoBehaviour
     {
         currentState = State.AIR;
         animator.SetBool("Wallclinging", false);
-        wallStickTimer = 0;
+        animator.SetBool("Aiming", true);
+        aimEffectAnimator.SetBool("AimEffect", true);
 
         aiming = true;
         canBlast = false;
 
-        animator.SetBool("Aiming", true);
-        aimEffectAnimator.SetBool("AimEffect", true);
-
-        // Start bullet time timer
+        wallStickTimer = 0;
         bulletTimeTimer = bulletTimeLength;
-
-        // Set time scale to the slowdown factor
         Time.timeScale = bulletTimeSlowdownFactor;
-        Time.fixedDeltaTime = Time.timeScale * .02f;
+        Time.fixedDeltaTime = Time.timeScale * .02f; // The default
     }
 
-    private void setLaserDirection(Vector2 aimDirection)
+    private void SetLaserDirection(Vector2 aimDirection)
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, 20f, LayerMask.GetMask("Ground"));
         laserGuide.positionCount = 2;
@@ -635,12 +632,10 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             FindObjectOfType<LevelManager>().Lose();
-
             laserGuide.enabled = false;
-
             bulletTimeTimer = 0;
             Time.timeScale = 1;
-            Time.fixedDeltaTime = .02f;
+            Time.fixedDeltaTime = .02f;  // The default
             AudioManager.instance.PlaySFX("Laser Blast");
         }
     }
