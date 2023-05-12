@@ -1,150 +1,138 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(LaserGuide))]
 public class PlayerMovement : MonoBehaviour
 {
     //Movement
     [Header("Movement")]
-    public float acceleration;
-    public float maxRunSpeed;
-    public Vector2 trueMaxSpeed;
-    public enum State { inAir, onGround, wallCling };
-    public State playerState = State.inAir;
-    //[HideInInspector]
-    public Vector2 platformVelocity;
+    [SerializeField] private float acceleration;
+    [SerializeField] private float maxRunSpeedX;
+    [SerializeField] private Vector2 trueMaxSpeed;
+    [SerializeField] private enum State {AIR, GROUND, WALL};
+    [SerializeField] private State currentState = State.AIR;
 
     //Jumping
     [Header("Jumping")]
-    public float jumpForce;
-    public float coyoteTimeLength;
-    public float inputBufferLength;
-    public float holdingForwardBufferLength;
-    public float jumpCooldownLength;
-    public float defaultGravity;
-    public float longJumpGravity;
-    public float fallingAccel;
-    public float maxGravity;
-    public float wallStickTime;
-    public float wallGravity;
-    public float wallThreshhold;
-    public float wallSpeedLoss;
-    public float wallSpeedDecay;
-    public float wallSplatTime;
-    public float yBlastTime;
+    [SerializeField] private float coyoteTimeLength;
+    [SerializeField] private float defaultGravity;
+    [SerializeField] private float fallingAccel;
+    [SerializeField] private float holdingForwardBufferLength;
+    [SerializeField] private float inputBufferLength;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float jumpCooldownLength;
+    [SerializeField] private float longJumpGravity;
+    [SerializeField] private float maxGravity;
+    [SerializeField] private float wallGravity;
+    [SerializeField] private float wallSpeedDecay;
+    [SerializeField] private float wallSpeedLoss;
+    [SerializeField] private float wallSplatTime;
+    [SerializeField] private float wallStickTime;
+    [SerializeField] private float wallThreshhold;
+    [SerializeField] private float yBlastTime;
 
     //Firing
     [Header("Firing")]
-    public GameObject bulletPrefab;
-    public float bulletForce;
-    public float bulletTimeLength;
-    public float blastCooldownTime;
-    public float bulletTimeSlowdownFactor;
-    public Animator aimEffectAnimator;
-    public bool canBlast = true;
-    public bool canShoot = true;
-    LaserGuide laserGuide;
-    public ParticleSystem blastTrail;
-    public ParticleSystem jumpDust;
-    public ParticleSystem wallJumpDust;
-    public ParticleSystem landDust;
-    public ParticleSystem slideDust;
-    public GameObject blast;
-    public Transform spriteTransform;
+    [SerializeField] private float blastForce;
+    [SerializeField] private float bulletTimeLength;
+    [SerializeField] private float blastCooldownTime;
+    [SerializeField] private float bulletTimeSlowdownFactor;
+    [SerializeField] private bool canBlast = true;
+    [SerializeField] private bool canShoot = true;
 
     // Ground Detection
     [Header("Ground Detection")]
-    [SerializeField] BoxCollider2D coll;
     [SerializeField] LayerMask groundLayer;
     [SerializeField] LayerMask groundAndPlatLayer;
 
-    private Rigidbody2D rbody;
-    private Animator animator;
-    public Animator ssAnimator;
-    public bool facingRight = true;
-    private float coyoteTimer = 0;
+    // References
+    [Header("References")]
+    [SerializeField] private LayerMask target;
+    [SerializeField] private ParticleSystem blastTrail;
+    [SerializeField] private ParticleSystem jumpDust;
+    [SerializeField] private ParticleSystem wallJumpDust;
+    [SerializeField] private ParticleSystem landDust;
+    [SerializeField] public ParticleSystem slideDust;
+    [SerializeField] private GameObject blast;
+    [SerializeField] private Transform spriteTransform;
+    [SerializeField] private Animator ssAnimator;
+    [SerializeField] private Animator aimEffectAnimator;
+
+    private bool facingRight = true;
     private bool coyoteTime = false;
-    private float inputBufferTimer = 0;
-    private float holdingForwardBufferTimer = 0;
-    private float jumpCooldownTimer = 0;
-    private float wallSplatTimer = 0;
-    private float wallStickTimer = 0;
-    private float yBlastTimer = 0;
-    public bool holdingForward = false;
-    private float bulletTimeTimer = 0;
-    private float blastCoolDownTimer = 0;
-    private float currentMaxSpeed;
-    private float accelValue;
-    private Vector2 goalSpeed;
+    private bool holdingForward = false;
     private bool longJump = false;
+    private bool aiming = false;
+    private float coyoteTimer;
+    private float inputBufferTimer;
+    private float holdingForwardBufferTimer;
+    private float jumpCooldownTimer;
+    private float wallSplatTimer;
+    private float wallStickTimer;
+    private float yBlastTimer;
+    private float bulletTimeTimer;
+    private float blastCoolDownTimer;
+    private float currentMaxSpeedX;
+    private float accelValue;
     private float fastFallModifier;
-    private bool shooting = false;
+    private float lastSpeedX;
+    private Vector2 goalSpeed;
+    [HideInInspector] public Vector2 platformVelocity;
+    private Rigidbody2D rbody;
+    private LineRenderer laserGuide;
+    private Animator animator;
+    private BoxCollider2D playerCollider;
     private Camera mainCam;
-    public float lastSpeed;
 
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        laserGuide = GetComponent<LaserGuide>();
+        laserGuide = GetComponent<LineRenderer>();
+        playerCollider = GetComponent<BoxCollider2D>();
         accelValue = acceleration;
         mainCam = Camera.main;
         fastFallModifier = 1;
-        playerState = State.inAir;
+        currentState = State.AIR;
     }
 
     private void Update()
     {
+        animator.SetBool("Down Blast", false);
+        animator.SetBool("Up Blast", false);
+        animator.SetBool("BW Blast", false);
+        animator.SetBool("FW Blast", false);
+        ssAnimator.SetBool("Squash", false);
+        ssAnimator.SetBool("Stretch", false);
+        aimEffectAnimator.SetBool("AimEffect", false);
 
         // Update the speed parameter in the animator
-        if(platformVelocity.x != 0)
-        {
-            animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x - platformVelocity.x) - .1f) + 1f, -1, 5));
-        }
-        else
-        {
-            animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x)) + 1f, -1, 5));
-        }
+        float platformOffset = platformVelocity.x != 0 ? .1f : 0f;
+        animator.SetFloat("Horizontal Speed", Mathf.Clamp(Mathf.Ceil(Mathf.Abs(rbody.velocity.x - platformVelocity.x) - platformOffset) + 1f, -1, 5));
 
         // Update the vertical velocity parameter in the animator
-        animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y-platformVelocity.y, -5, 5));
+        animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y - platformVelocity.y, -5, 5));
 
         // If Turning
-        if (((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) && playerState != State.wallCling)
+        if (((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) && currentState != State.WALL)
         {
-            Flip();
+            Turn();
         }
 
         // Update the moving backwards paramater in the animator
-        if (transform.localScale.x * rbody.velocity.x < 0)
-        {
-            animator.SetBool("Moving Backwards", true);
-        }
-        else
-        {
-            animator.SetBool("Moving Backwards", false);
-        }
+        animator.SetBool("Moving Backwards", transform.localScale.x * rbody.velocity.x < 0);
         
-        // Calulate if the player is holding in the direction they are facing
+        // Calulate if the player is holding in the direction they are facing with input buffering
         if ((facingRight && goalSpeed.x > 0) || (!facingRight && goalSpeed.x < 0))
         {
             holdingForward = true;
             holdingForwardBufferTimer = holdingForwardBufferLength;
         }
-
         if (holdingForwardBufferTimer <= 0f)
             holdingForward = false;
 
-        ssAnimator.SetBool("Stretch", false);
-
         // Player States Input-Based Calculations
         // IN AIR
-        if (playerState == State.inAir)
+        if (currentState == State.AIR)
         {
-
             // If Jumping
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -155,7 +143,6 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else
                 {
-                    // Sets Input Buffer Timer
                     inputBufferTimer = inputBufferLength;
                 }
             }
@@ -175,7 +162,7 @@ public class PlayerMovement : MonoBehaviour
 
         }
         // ON GROUND
-        else if (playerState == State.onGround)
+        else if (currentState == State.GROUND)
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
@@ -183,7 +170,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         // ON WALL
-        else if (playerState == State.wallCling)
+        else if (currentState == State.WALL)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -192,154 +179,32 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Blasting
-        animator.SetBool("Down Blast", false);
-        animator.SetBool("Up Blast", false);
-        animator.SetBool("BW Blast", false);
-        animator.SetBool("FW Blast", false);
-        ssAnimator.SetBool("Squash", false);
-        aimEffectAnimator.SetBool("AimEffect", false);
-
         if (Input.GetMouseButtonDown(0) && canBlast && blastCoolDownTimer <= 0)
         {
-            canBlast = false;
-            bool ignore = false;
-            rbody.gravityScale = defaultGravity;
-
-            if (playerState == State.onGround)
-            {
-                blastCoolDownTimer = blastCooldownTime;
-            }
-
-            if (playerState == State.wallCling)
-            {
-                playerState = State.inAir;
-                animator.SetBool("Wallclinging", false);
-                wallStickTimer = 0;
-                wallSplatTimer = 0;
-                lastSpeed = 0;
-                Flip();
-            }
-
-            Vector2 blastDirection = getVectorFromPlayerToMouse();
-
-            // Confine blast directions to 4
-            blastDirection = Mathf.Abs(blastDirection.x) > Mathf.Abs(blastDirection.y) ? Vector2.right * Mathf.Sign(blastDirection.x) : Vector2.up * Mathf.Sign(blastDirection.y);
-
-            Vector2 newVelocity = rbody.velocity + (-blastDirection * bulletForce);
-            if (blastDirection.x == 0)
-            {
-                if (blastDirection.y < 0)
-                {
-                    // Minimum y velocity after a downwards blast
-                    float minY = 6f;
-                    if (rbody.velocity.y + bulletForce < minY)
-                        newVelocity = new Vector2(rbody.velocity.x, minY);
-                    yBlastTimer = yBlastTime;
-                    animator.SetBool("Grounded", false);
-                    animator.SetBool("Down Blast", true);
-                    ssAnimator.SetBool("Stretch", true);
-                }
-                else if (playerState == State.inAir)
-                {
-                    coyoteTimer = 0;
-                    jumpCooldownTimer = coyoteTimeLength;
-                    animator.SetBool("Up Blast", true);
-                    ssAnimator.SetBool("Stretch", true);
-                    yBlastTimer = yBlastTime;
-                }
-                else
-                {
-                    ignore = true;
-                }
-            }
-            else
-            {
-                if (facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
-                    animator.SetBool("BW Blast", true);
-                else
-                    animator.SetBool("FW Blast", true);
-                if (playerState == State.inAir)
-                    ssAnimator.SetBool("Squash", true);
-            }
-            
-            if (!ignore)
-            {
-                float y = rbody.velocity.y > trueMaxSpeed.y && blastDirection != Vector2.up ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
-                rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
-
-                longJump = false;
-
-                Vector3 blastPos = new Vector3(transform.position.x + blastDirection.x * .5f, transform.position.y + blastDirection.y * .5f, 0);
-                Instantiate(blast, blastPos, Quaternion.identity);
-
-                // Play particle effect
-                blastTrail.Play();
-                
-                AudioManager.instance.PlaySFX("Blast");
-            }
+            Blast();
         }
 
         // Shooting
-        if (Input.GetMouseButtonDown(1) && !shooting && canShoot)
+        if (Input.GetMouseButtonDown(1) && !aiming && canShoot)
         {
-            playerState = State.inAir;
-            animator.SetBool("Wallclinging", false);
-            wallStickTimer = 0;
-
-            shooting = true;
-            canBlast = false;
-
-            animator.SetBool("Aiming", true);
-            aimEffectAnimator.SetBool("AimEffect", true);
-
-            // Start bullet time timer
-            bulletTimeTimer = bulletTimeLength;
-            
-            // Set time scale to the slowdown factor
-            Time.timeScale = bulletTimeSlowdownFactor;
-            Time.fixedDeltaTime = Time.timeScale * .02f;
+            Aim();
         }
-        if (shooting) {
+
+        if (aiming) {
+            if (!facingRight)
+                Turn();
+            if (Input.GetMouseButtonUp(1))
+                bulletTimeTimer = -1;
             Vector2 laserDirection = getVectorFromPlayerToMouse();
             animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
-            if (!facingRight)
-                Flip();
             spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
-            laserGuide.setLaserDirection(laserDirection);
-            laserGuide.showLaser();
+            setLaserDirection(laserDirection);
+            laserGuide.enabled = true;
         }
-        if(bulletTimeTimer > 0 && Input.GetMouseButtonUp(1))
-        {
-            bulletTimeTimer = -1;
-        }
+
         if (bulletTimeTimer < 0)
         {
-            canShoot = false;
-            shooting = false;
-            animator.SetBool("Aiming", false);
-
-            spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
-
-            Vector2 laserDirection = getVectorFromPlayerToMouse();
-
-            GameObject newBullet = Instantiate(bulletPrefab, transform.position, spriteTransform.rotation);
-            newBullet.GetComponent<BulletPhysics>().movAngle = laserDirection;
-
-            Vector2 newVelocity = rbody.velocity + (-laserDirection.normalized * bulletForce);
-            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y));
-
-            longJump = false;
-
-            laserGuide.hideLaser();
-            //bulletTimeIndicatorAnimator.SetBool("BulletTime", false);
-
-            // Reset bullet time parameters
-            bulletTimeTimer = 0;
-            // Reset the time scale
-            Time.timeScale = 1;
-            Time.fixedDeltaTime = .02f;
-
-            AudioManager.instance.PlaySFX("Laser Blast");
+            Shoot();
         }
     }
 
@@ -350,19 +215,19 @@ public class PlayerMovement : MonoBehaviour
         ssAnimator.SetBool("Neutral", false);
         // Player States
         // IN AIR
-        if (playerState == State.inAir)
+        if (currentState == State.AIR)
         {
             // Restrict Horizontal Movement In Air
             accelValue = .7f * acceleration;
 
             // If B-Hopping, Change Max Speed settings to keep current momentum
-            if (Mathf.Abs(rbody.velocity.x) > maxRunSpeed && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
+            if (Mathf.Abs(rbody.velocity.x) > maxRunSpeedX && Mathf.Sign(rbody.velocity.x) == Mathf.Sign(Input.GetAxisRaw("Horizontal")))
             {
-                currentMaxSpeed = Mathf.Abs(rbody.velocity.x);
+                currentMaxSpeedX = Mathf.Abs(rbody.velocity.x);
             }
             else
             {
-                currentMaxSpeed = maxRunSpeed;
+                currentMaxSpeedX = maxRunSpeedX;
             }
 
             // Variable Jump Height
@@ -420,12 +285,12 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
-            //OnGround Transtion
+            //GROUND Transtion
             if (isGrounded())
             {
                 canBlast = true;
                 coyoteTime = true;
-                playerState = State.onGround;
+                currentState = State.GROUND;
                 rbody.gravityScale = defaultGravity;
                 animator.SetBool("Grounded", true);
                 ssAnimator.SetBool("Land", true);
@@ -435,12 +300,12 @@ public class PlayerMovement : MonoBehaviour
             //WallCling Transition
             else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
             {
-                playerState = State.wallCling;
+                currentState = State.WALL;
                 wallStickTimer = wallStickTime;
                 animator.SetBool("Wallclinging", true);
                 if (rbody.velocity.y > trueMaxSpeed.y)
                     rbody.velocity = new Vector2(rbody.velocity.x, trueMaxSpeed.y);
-                if (Mathf.Abs(lastSpeed) > maxRunSpeed)
+                if (Mathf.Abs(lastSpeedX) > maxRunSpeedX)
                 {
                     ssAnimator.SetBool("WallSplat", true);
                     wallSplatTimer = wallSplatTime;
@@ -450,7 +315,7 @@ public class PlayerMovement : MonoBehaviour
                         rbody.velocity = Vector2.zero;
                     }
 
-                    if (Mathf.Abs(lastSpeed) > maxRunSpeed * 1.5f)
+                    if (Mathf.Abs(lastSpeedX) > maxRunSpeedX * 1.5f)
                     {
                         AudioManager.instance.PlaySFX("Splat");
                     }
@@ -458,11 +323,11 @@ public class PlayerMovement : MonoBehaviour
             }
             else if(!(isOnWall() && holdingForward))
             {
-                lastSpeed = rbody.velocity.x;
+                lastSpeedX = rbody.velocity.x;
             }
         }
         // ON GROUND
-        else if (playerState == State.onGround)
+        else if (currentState == State.GROUND)
         {
             if (inputBufferTimer > 0)
             {
@@ -478,13 +343,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 accelValue = acceleration;
             }
-            currentMaxSpeed = maxRunSpeed;
+            currentMaxSpeedX = maxRunSpeedX;
             canBlast = true;
-            lastSpeed = rbody.velocity.x;
+            lastSpeedX = rbody.velocity.x;
             //Air Transition
             if (isGrounded() == false)
             {
-                playerState = State.inAir;
+                currentState = State.AIR;
                 coyoteTimer = coyoteTimeLength;
                 blastCoolDownTimer = 0;
                 animator.SetBool("Grounded", false);
@@ -493,7 +358,7 @@ public class PlayerMovement : MonoBehaviour
             //Cannot Transition To WallCling
         }
         // WALL CLING
-        else if (playerState == State.wallCling)
+        else if (currentState == State.WALL)
         {
             if (holdingForward)
             {
@@ -506,42 +371,42 @@ public class PlayerMovement : MonoBehaviour
             if (wallSplatTimer <= 0 && rbody.velocity.y <= 0f)
             {
                 rbody.gravityScale = wallGravity;
-                lastSpeed = 0;
+                lastSpeedX = 0;
             }
                 
-            //InAir Transition - Jumped Off Located In WallJump()
-            //InAir Transition - Shot Located In Shooting()
-            //InAir Transition - Let Go
+            //AIR Transition - Jumped Off Located In WallJump()
+            //AIR Transition - Shot Located In Shooting()
+            //AIR Transition - Let Go
             if (wallStickTimer <= 0)
             {
-                playerState = State.inAir;
+                currentState = State.AIR;
                 animator.SetBool("Wallclinging", false);
                 ssAnimator.SetBool("Neutral", true);
-                Flip();
+                Turn();
             }
-            //InAir Transition - Slid Off
+            //AIR Transition - Slid Off
             else if(!isOnWall())
             {
-                playerState = State.inAir;
+                currentState = State.AIR;
                 animator.SetBool("Wallclinging", false);
                 ssAnimator.SetBool("Neutral", true);
                 wallStickTimer = 0;
-                Flip();
+                Turn();
             }
-            //OnGround Transition
+            //GROUND Transition
             else if(isGrounded())
             {
                 coyoteTime = true;
                 wallStickTimer = 0;
-                playerState = State.onGround;
+                currentState = State.GROUND;
                 animator.SetBool("Wallclinging", false);
                 animator.SetBool("Grounded", true);
             }
         }
 
-        // Horizontal Speed for inAir and onGround
-        goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeed, rbody.velocity.y);
-        if (playerState != State.wallCling)
+        // Horizontal Speed for air and ground
+        goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeedX, rbody.velocity.y);
+        if (currentState != State.WALL)
         {
             rbody.velocity = Vector2.MoveTowards(rbody.velocity-platformVelocity, goalSpeed, accelValue * Time.fixedDeltaTime) + platformVelocity;
         }
@@ -572,15 +437,15 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded()
     {
-        return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .02f, groundAndPlatLayer);
+        return Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0f, Vector2.down, .02f, groundAndPlatLayer);
     }
     private bool isOnWall()
     {
         Vector2 dir = facingRight ? Vector2.right : Vector2.left;
-        return Physics2D.BoxCast(coll.bounds.center, new Vector2(coll.bounds.size.x, .6f) , 0f, dir, .04f, groundLayer);
+        return Physics2D.BoxCast(playerCollider.bounds.center, new Vector2(playerCollider.bounds.size.x, .7f) , 0f, dir, .04f, groundLayer);
     }
 
-    private void Flip()
+    private void Turn()
     {
         facingRight = !facingRight;
         Vector3 scale = transform.localScale;
@@ -606,7 +471,7 @@ public class PlayerMovement : MonoBehaviour
     private void WallJump()
     {
         // If still splatting on wall, perform a super wall jump, otherwise perform a regular one
-        float magnitude = wallSplatTimer > 0 ? Mathf.Abs(lastSpeed) : maxRunSpeed;
+        float magnitude = wallSplatTimer > 0 ? Mathf.Abs(lastSpeedX) : maxRunSpeedX;
 
         if (facingRight)
             magnitude = magnitude * -1;
@@ -620,19 +485,19 @@ public class PlayerMovement : MonoBehaviour
         longJump = Input.GetKey(KeyCode.Space);
         fastFallModifier = 1;
 
-        //InAir Transition - Jumped Off
+        //AIR Transition - Jumped Off
         wallStickTimer = 0;
         wallSplatTimer = 0;
         animator.SetBool("Wallclinging", false);
-        playerState = State.inAir;
-        Flip();
+        currentState = State.AIR;
+        Turn();
         
         AudioManager.instance.PlaySFX("Jump");
     }
 
     public void Bounce(float strength)
     {
-        if (playerState != State.wallCling)
+        if (currentState != State.WALL)
         {
             transform.position = new Vector3(transform.position.x, transform.position.y + .3f, 0f);
             rbody.velocity = new Vector2(rbody.velocity.x, strength);
@@ -640,6 +505,143 @@ public class PlayerMovement : MonoBehaviour
             coyoteTime = false;
             animator.SetBool("Grounded", false);
             AudioManager.instance.PlaySFX("Bounce");
+        }
+    }
+
+    private void Blast()
+    {
+        canBlast = false;
+        bool ignore = false;
+        rbody.gravityScale = defaultGravity;
+
+        if (currentState == State.GROUND)
+        {
+            blastCoolDownTimer = blastCooldownTime;
+        }
+
+        if (currentState == State.WALL)
+        {
+            currentState = State.AIR;
+            animator.SetBool("Wallclinging", false);
+            wallStickTimer = 0;
+            wallSplatTimer = 0;
+            lastSpeedX = 0;
+            Turn();
+        }
+
+        Vector2 blastDirection = getVectorFromPlayerToMouse();
+
+        // Confine blast directions to 4
+        blastDirection = Mathf.Abs(blastDirection.x) > Mathf.Abs(blastDirection.y) ? Vector2.right * Mathf.Sign(blastDirection.x) : Vector2.up * Mathf.Sign(blastDirection.y);
+
+        Vector2 newVelocity = rbody.velocity + (-blastDirection * blastForce);
+        if (blastDirection.x == 0)
+        {
+            if (blastDirection.y < 0)
+            {
+                // Minimum y velocity after a downwards blast
+                float minY = 6f;
+                if (rbody.velocity.y + blastForce < minY)
+                    newVelocity = new Vector2(rbody.velocity.x, minY);
+                yBlastTimer = yBlastTime;
+                animator.SetBool("Grounded", false);
+                animator.SetBool("Down Blast", true);
+                ssAnimator.SetBool("Stretch", true);
+            }
+            else if (currentState == State.AIR)
+            {
+                coyoteTimer = 0;
+                jumpCooldownTimer = coyoteTimeLength;
+                animator.SetBool("Up Blast", true);
+                ssAnimator.SetBool("Stretch", true);
+                yBlastTimer = yBlastTime;
+            }
+            else
+            {
+                ignore = true;
+            }
+        }
+        else
+        {
+            if (facingRight && blastDirection.x < 0 || !facingRight && blastDirection.x > 0)
+                animator.SetBool("BW Blast", true);
+            else
+                animator.SetBool("FW Blast", true);
+            if (currentState == State.AIR)
+                ssAnimator.SetBool("Squash", true);
+        }
+
+        if (!ignore)
+        {
+            float y = rbody.velocity.y > trueMaxSpeed.y && blastDirection != Vector2.up ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
+            rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
+
+            longJump = false;
+
+            Vector3 blastPos = new Vector3(transform.position.x + blastDirection.x * .5f, transform.position.y + blastDirection.y * .5f, 0);
+            Instantiate(blast, blastPos, Quaternion.identity);
+
+            // Play particle effect
+            blastTrail.Play();
+
+            AudioManager.instance.PlaySFX("Blast");
+        }
+    }
+
+    private void Aim()
+    {
+        currentState = State.AIR;
+        animator.SetBool("Wallclinging", false);
+        wallStickTimer = 0;
+
+        aiming = true;
+        canBlast = false;
+
+        animator.SetBool("Aiming", true);
+        aimEffectAnimator.SetBool("AimEffect", true);
+
+        // Start bullet time timer
+        bulletTimeTimer = bulletTimeLength;
+
+        // Set time scale to the slowdown factor
+        Time.timeScale = bulletTimeSlowdownFactor;
+        Time.fixedDeltaTime = Time.timeScale * .02f;
+    }
+
+    private void setLaserDirection(Vector2 aimDirection)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, 20f, LayerMask.GetMask("Ground"));
+        laserGuide.positionCount = 2;
+        laserGuide.SetPosition(0, transform.position);
+        laserGuide.SetPosition(1, hit.point);
+    }
+
+    private void Shoot()
+    {
+        canShoot = false;
+        aiming = false;
+        animator.SetBool("Aiming", false);
+
+        spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
+
+        Vector2 laserDirection = getVectorFromPlayerToMouse();
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, laserDirection, 1000, target);
+        if (hit.collider != null && hit.collider.gameObject.tag == "Target")
+        {
+            hit.collider.gameObject.GetComponent<Target>().Shatter();
+            Destroy(gameObject);
+        } 
+        else
+        {
+            FindObjectOfType<LevelManager>().Lose();
+
+            laserGuide.enabled = false;
+
+            bulletTimeTimer = 0;
+            Time.timeScale = 1;
+            Time.fixedDeltaTime = .02f;
+            AudioManager.instance.PlaySFX("Laser Blast");
         }
     }
 

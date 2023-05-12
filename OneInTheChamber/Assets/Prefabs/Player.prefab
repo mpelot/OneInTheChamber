@@ -5072,7 +5072,6 @@ GameObject:
   - component: {fileID: 2861250680605902038}
   - component: {fileID: 2861250680605902039}
   - component: {fileID: 2861250680605902037}
-  - component: {fileID: 2861250680605902034}
   - component: {fileID: 2861250680605902035}
   - component: {fileID: 1914156811768020217}
   m_Layer: 6
@@ -5120,34 +5119,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   acceleration: 12
-  maxRunSpeed: 5
+  maxRunSpeedX: 5
   trueMaxSpeed: {x: 20, y: 10}
-  playerState: 0
-  platformVelocity: {x: 0, y: 0}
-  jumpForce: 7
+  currentState: 0
   coyoteTimeLength: 0.06
-  inputBufferLength: 0.1
-  holdingForwardBufferLength: 0.1
-  jumpCooldownLength: 0.4
   defaultGravity: 2
-  longJumpGravity: 1.75
   fallingAccel: 3
+  holdingForwardBufferLength: 0.1
+  inputBufferLength: 0.1
+  jumpForce: 7
+  jumpCooldownLength: 0.4
+  longJumpGravity: 1.75
   maxGravity: 6
-  wallStickTime: 0.2
   wallGravity: 0.8
-  wallThreshhold: -8
-  wallSpeedLoss: 0.6
   wallSpeedDecay: 3
+  wallSpeedLoss: 0.6
   wallSplatTime: 0.3
+  wallStickTime: 0.2
+  wallThreshhold: -8
   yBlastTime: 0.2
-  bulletPrefab: {fileID: 1511166474568368182, guid: 9b52aa974053e0548bcb6a2ae6d97172, type: 3}
-  bulletForce: 8
+  blastForce: 8
   bulletTimeLength: 0.7
   blastCooldownTime: 1
   bulletTimeSlowdownFactor: 0.15
-  aimEffectAnimator: {fileID: 3022594834219627877}
   canBlast: 1
   canShoot: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  groundAndPlatLayer:
+    serializedVersion: 2
+    m_Bits: 4224
+  target:
+    serializedVersion: 2
+    m_Bits: 6272
   blastTrail: {fileID: 4963120889006692333}
   jumpDust: {fileID: 8836952792229693368}
   wallJumpDust: {fileID: 2551223209336459298}
@@ -5155,16 +5160,9 @@ MonoBehaviour:
   slideDust: {fileID: 5316009974375099701}
   blast: {fileID: 934485827783583829, guid: 8d965d08dd72f6d499f6400d31d05ffd, type: 3}
   spriteTransform: {fileID: 1157575191562551380}
-  coll: {fileID: 2861250680605902039}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  groundAndPlatLayer:
-    serializedVersion: 2
-    m_Bits: 4224
   ssAnimator: {fileID: 5631376533816099083}
-  facingRight: 1
-  lastSpeed: 0
+  aimEffectAnimator: {fileID: 3022594834219627877}
+  platformVelocity: {x: 0, y: 0}
 --- !u!50 &2861250680605902038
 Rigidbody2D:
   serializedVersion: 4
@@ -5232,21 +5230,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!114 &2861250680605902034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2861250680605902042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a47a4056f76d2394198910814d28b643, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  laserDistance: 20
-  rayCastWidth: 0.25
-  maxBounces: 1
 --- !u!120 &2861250680605902035
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -5254,7 +5237,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2861250680605902042}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
