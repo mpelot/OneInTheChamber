@@ -28,6 +28,10 @@ public class Crosshair : MonoBehaviour
             aiming = true;
             animator.Play("Crosshair");
         }
+        if (Input.GetMouseButtonUp(1) && aiming)
+        {
+            aiming = false;
+        }
         if (!aiming)
         {
             Vector2 dir = playerTransform.position - transform.position;

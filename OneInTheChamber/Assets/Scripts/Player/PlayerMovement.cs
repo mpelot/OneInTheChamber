@@ -103,6 +103,7 @@ public class PlayerMovement : MonoBehaviour
         ssAnimator.SetBool("Squash", false);
         ssAnimator.SetBool("Stretch", false);
         aimEffectAnimator.SetBool("AimEffect", false);
+        aimEffectAnimator.SetBool("AimCancel", false);
 
         // Update the speed parameter in the animator
         float platformOffset = platformVelocity.x != 0 ? .1f : 0f;
@@ -190,21 +191,23 @@ public class PlayerMovement : MonoBehaviour
             Aim();
         }
 
-        if (aiming) {
+        if (aiming) 
+        {
             if (!facingRight)
                 Turn();
             if (Input.GetMouseButtonUp(1))
-                bulletTimeTimer = -1;
-            Vector2 laserDirection = getVectorFromPlayerToMouse();
-            animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
-            spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
-            SetLaserDirection(laserDirection);
-            laserGuide.enabled = true;
-        }
-
-        if (bulletTimeTimer < 0)
-        {
-            Shoot();
+                AimCancel();
+            else if (bulletTimeTimer < 0)
+                Shoot();
+            else
+            {
+                rbody.velocity = Vector2.MoveTowards(rbody.velocity, Vector2.zero, 20f * Time.fixedDeltaTime);
+                Vector2 laserDirection = getVectorFromPlayerToMouse();
+                animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
+                spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
+                SetLaserDirection(laserDirection);
+                laserGuide.enabled = true;
+            }
         }
     }
 
@@ -290,6 +293,7 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded() && !(isOnWall() && !groundCheck))
             {
                 canBlast = true;
+                canShoot = true;
                 coyoteTime = true;
                 currentState = State.GROUND;
                 rbody.gravityScale = defaultGravity;
@@ -346,6 +350,7 @@ public class PlayerMovement : MonoBehaviour
             }
             currentMaxSpeedX = maxRunSpeedX;
             canBlast = true;
+            canShoot = true;
             lastSpeedX = rbody.velocity.x;
             //Air Transition
             if (isGrounded() == false)
@@ -603,6 +608,22 @@ public class PlayerMovement : MonoBehaviour
         bulletTimeTimer = bulletTimeLength;
         Time.timeScale = bulletTimeSlowdownFactor;
         Time.fixedDeltaTime = Time.timeScale * .02f; // The default
+    }
+
+    private void AimCancel()
+    {
+        bulletTimeTimer = -1;
+        aiming = false;
+        canShoot = false;
+        animator.SetBool("Aiming", false);
+        aimEffectAnimator.SetBool("AimCancel", true);
+
+        spriteTransform.rotation = Quaternion.identity;
+
+        laserGuide.enabled = false;
+        bulletTimeTimer = 0;
+        Time.timeScale = 1;
+        Time.fixedDeltaTime = .02f;  // The default
     }
 
     private void SetLaserDirection(Vector2 aimDirection)
