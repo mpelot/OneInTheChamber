@@ -100,8 +100,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a818e9890d64a4081d769cdbd524af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  start: {x: -7, y: -0.25}
-  end: {x: -7, y: 6.75}
+  start: {x: -14, y: 6}
+  end: {x: -19, y: 6}
   time: 10
   attached: 0
 --- !u!50 &1971467315063668295

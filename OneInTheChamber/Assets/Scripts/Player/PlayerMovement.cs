@@ -74,6 +74,7 @@ public class PlayerMovement : MonoBehaviour
     private float accelValue;
     private float fastFallModifier;
     private float lastSpeedX;
+    [HideInInspector] public Vector2 lastSpeed;
     private Vector2 goalSpeed;
     [HideInInspector] public Vector2 platformVelocity;
     private Rigidbody2D rbody;
@@ -227,6 +228,8 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        lastSpeed = rbody.velocity;
+
         ssAnimator.SetBool("Land", false);
         ssAnimator.SetBool("WallSplat", false);
         ssAnimator.SetBool("Neutral", false);
