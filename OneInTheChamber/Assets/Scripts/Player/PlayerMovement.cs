@@ -573,6 +573,10 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (currentState == State.AIR)
             {
+                // Maximum y velocity after an upwards blast
+                float maxY = -8.3f;
+                if (newVelocity.y > maxY)
+                    newVelocity = new Vector2(rbody.velocity.x, maxY);
                 coyoteTimer = 0;
                 jumpCooldownTimer = coyoteTimeLength;
                 animator.SetBool("Up Blast", true);

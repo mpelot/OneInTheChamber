@@ -153,5 +153,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeUntilDrop: 0.5
   resetTime: 1
-  forceVelocity: 9
+  forceVelocity: 8.3
   hitBox: {fileID: 4579083083893330492}
