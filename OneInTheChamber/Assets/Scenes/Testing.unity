@@ -24417,7 +24417,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6275031246612011919, guid: 3a7a7b8d0dca388448d33af1175e988c, type: 3}
       propertyPath: m_Name
-      value: Dropper (1)
+      value: Gate (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a7a7b8d0dca388448d33af1175e988c, type: 3}
@@ -25265,7 +25265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6275031246612011919, guid: 3a7a7b8d0dca388448d33af1175e988c, type: 3}
       propertyPath: m_Name
-      value: Dropper
+      value: Gate
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a7a7b8d0dca388448d33af1175e988c, type: 3}

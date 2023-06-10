@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dropper : MonoBehaviour
+public class Gate : MonoBehaviour
 {
     private enum Orientation
     {
@@ -12,19 +12,19 @@ public class Dropper : MonoBehaviour
         Right
     }
 
-    public float timeUntilDrop;
+    public float timeUntilOpen;
     public float resetTime;
     public float forceVelocity;
     public BoxCollider2D hitBox;
 
     private SpriteRenderer spriteRenderer;
     private Orientation orientation;
-    private bool queueClosePlatform;
+    private bool queueCloseGate;
 
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        queueClosePlatform = false;
+        queueCloseGate = false;
         
         switch (transform.rotation.eulerAngles.z % 360)
         {
@@ -47,11 +47,11 @@ public class Dropper : MonoBehaviour
     {
         if (collision.gameObject.name == "Player")
         {
-            if (queueClosePlatform)
+            if (queueCloseGate)
             {
-                queueClosePlatform = false;
-                CancelInvoke("ClosePlatform");
-                Invoke("ClosePlatform", resetTime);
+                queueCloseGate = false;
+                CancelInvoke("CloseGate");
+                Invoke("CloseGate", resetTime);
             }
             else
             {
@@ -62,13 +62,13 @@ public class Dropper : MonoBehaviour
                     || orientation == Orientation.Right && lastPlayerSpeed.x < -forceVelocity)
                 {
                     collision.gameObject.GetComponent<Rigidbody2D>().velocity = lastPlayerSpeed;
-                    OpenPlatform();
-                    Invoke("ClosePlatform", resetTime);
+                    OpenGate();
+                    Invoke("CloseGate", resetTime);
                 }
                 else
                 {
-                    Invoke("OpenPlatform", timeUntilDrop);
-                    Invoke("ClosePlatform", timeUntilDrop + resetTime);
+                    Invoke("OpenGate", timeUntilOpen);
+                    Invoke("CloseGate", timeUntilOpen + resetTime);
                 }
             }
         }
@@ -78,18 +78,18 @@ public class Dropper : MonoBehaviour
     {
         if (collision.gameObject.name == "Player")
         {
-            if (queueClosePlatform)
+            if (queueCloseGate)
             {
-                ClosePlatform();
+                CloseGate();
             }
             else
             {
-                queueClosePlatform = true;
+                queueCloseGate = true;
             }
         }
     }
 
-    private void OpenPlatform()
+    private void OpenGate()
     {
         this.gameObject.layer = LayerMask.NameToLayer("Default");
         hitBox.enabled = false;
@@ -99,9 +99,9 @@ public class Dropper : MonoBehaviour
         spriteRenderer.color = color;
     }
 
-    private void ClosePlatform()
+    private void CloseGate()
     {
-        if (queueClosePlatform)
+        if (queueCloseGate)
         {
             this.gameObject.layer = LayerMask.NameToLayer("Ground");
             hitBox.enabled = true;
@@ -110,11 +110,11 @@ public class Dropper : MonoBehaviour
             color.a = 1f;
             spriteRenderer.color = color;
 
-            queueClosePlatform = false;
+            queueCloseGate = false;
         }
         else
         {
-            queueClosePlatform = true;
+            queueCloseGate = true;
         }
     }
 }
