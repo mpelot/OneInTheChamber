@@ -51,6 +51,9 @@ TagManager:
   - name: Bullet
     uniqueID: 453682285
     locked: 0
+  - name: Player
+    uniqueID: 4048455867
+    locked: 0
   - name: Laser
     uniqueID: 1907034687
     locked: 0
@@ -59,9 +62,6 @@ TagManager:
     locked: 0
   - name: FG
     uniqueID: 1130558793
-    locked: 0
-  - name: Player
-    uniqueID: 4048455867
     locked: 0
   - name: Cursor
     uniqueID: 1725115929
