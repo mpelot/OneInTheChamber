@@ -35,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float bulletTimeLength;
     [SerializeField] private float blastCooldownTime;
     [SerializeField] private float bulletTimeSlowdownFactor;
-    [SerializeField] private bool canBlast = true;
+    [SerializeField] public bool canBlast = true;
     [SerializeField] private bool canShoot = true;
 
     // Ground Detection

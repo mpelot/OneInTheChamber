@@ -62,6 +62,10 @@ public class Gate : MonoBehaviour
                     || orientation == Orientation.Left && lastPlayerSpeed.x > forceVelocity
                     || orientation == Orientation.Right && lastPlayerSpeed.x < -forceVelocity)
                 {
+                    if (orientation == Orientation.Up)
+                    {
+                        collision.gameObject.GetComponent<PlayerMovement>().canBlast = true;
+                    }
                     collision.gameObject.GetComponent<Rigidbody2D>().velocity = lastPlayerSpeed;
                     animator.SetBool("Slam", true);
                     StartCoroutine(HitPause());
