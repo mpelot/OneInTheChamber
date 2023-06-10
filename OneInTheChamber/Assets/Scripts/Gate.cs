@@ -18,12 +18,14 @@ public class Gate : MonoBehaviour
     public BoxCollider2D hitBox;
 
     private SpriteRenderer spriteRenderer;
+    private Animator animator;
     private Orientation orientation;
     private bool queueCloseGate;
 
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
         queueCloseGate = false;
         
         switch (transform.rotation.eulerAngles.z % 360)
@@ -62,6 +64,7 @@ public class Gate : MonoBehaviour
                     || orientation == Orientation.Right && lastPlayerSpeed.x < -forceVelocity)
                 {
                     collision.gameObject.GetComponent<Rigidbody2D>().velocity = lastPlayerSpeed;
+                    animator.SetBool("Slam", true);
                     OpenGate();
                     Invoke("CloseGate", resetTime);
                 }
@@ -97,6 +100,7 @@ public class Gate : MonoBehaviour
         Color color = spriteRenderer.color;
         color.a = 0.5f;
         spriteRenderer.color = color;
+        animator.SetBool("Opened", true);
     }
 
     private void CloseGate()
@@ -111,6 +115,8 @@ public class Gate : MonoBehaviour
             spriteRenderer.color = color;
 
             queueCloseGate = false;
+            animator.SetBool("Opened", false);
+            animator.SetBool("Slam", false);
         }
         else
         {
