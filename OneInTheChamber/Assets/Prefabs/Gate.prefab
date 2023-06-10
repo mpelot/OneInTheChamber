@@ -154,5 +154,5 @@ MonoBehaviour:
   timeUntilOpen: 0.5
   resetTime: 1
   forceVelocity: 8.3
-  hitPauseDuration: 0.1
+  hitPauseDuration: 0
   hitBox: {fileID: 4579083083893330492}
