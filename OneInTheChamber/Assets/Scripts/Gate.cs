@@ -18,14 +18,12 @@ public class Gate : MonoBehaviour
     public float hitPauseDuration;
     public BoxCollider2D hitBox;
 
-    private SpriteRenderer spriteRenderer;
     private Animator animator;
     private Orientation orientation;
     private bool queueCloseGate;
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         queueCloseGate = false;
         
@@ -98,10 +96,6 @@ public class Gate : MonoBehaviour
     {
         this.gameObject.layer = LayerMask.NameToLayer("Default");
         hitBox.enabled = false;
-        
-        Color color = spriteRenderer.color;
-        color.a = 0.5f;
-        spriteRenderer.color = color;
         animator.SetBool("Opened", true);
     }
 
@@ -112,10 +106,6 @@ public class Gate : MonoBehaviour
             this.gameObject.layer = LayerMask.NameToLayer("Ground");
             hitBox.enabled = true;
             
-            Color color = spriteRenderer.color;
-            color.a = 1f;
-            spriteRenderer.color = color;
-
             queueCloseGate = false;
             animator.SetBool("Opened", false);
             animator.SetBool("Slam", false);
