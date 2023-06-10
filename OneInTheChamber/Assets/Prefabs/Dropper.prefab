@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 6275031246612011919}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -28.5, y: 7.5, z: 0}
-  m_LocalScale: {x: 3, y: 0.5, z: 1}
+  m_LocalScale: {x: 2, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -155,3 +155,4 @@ MonoBehaviour:
   resetTime: 1
   forceVelocity: 8.3
   hitBox: {fileID: 4579083083893330492}
+  queueClosePlatform: 0
