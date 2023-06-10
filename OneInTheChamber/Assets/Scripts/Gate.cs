@@ -15,6 +15,7 @@ public class Gate : MonoBehaviour
     public float timeUntilOpen;
     public float resetTime;
     public float forceVelocity;
+    public float hitPauseDuration;
     public BoxCollider2D hitBox;
 
     private SpriteRenderer spriteRenderer;
@@ -65,6 +66,7 @@ public class Gate : MonoBehaviour
                 {
                     collision.gameObject.GetComponent<Rigidbody2D>().velocity = lastPlayerSpeed;
                     animator.SetBool("Slam", true);
+                    StartCoroutine(HitPause());
                     OpenGate();
                     Invoke("CloseGate", resetTime);
                 }
@@ -122,5 +124,13 @@ public class Gate : MonoBehaviour
         {
             queueCloseGate = true;
         }
+    }
+
+    private IEnumerator HitPause()
+    {
+        yield return new WaitForSecondsRealtime(0.05f);
+        Time.timeScale = 0f;
+        yield return new WaitForSecondsRealtime(hitPauseDuration);
+        Time.timeScale = 1f;
     }
 }

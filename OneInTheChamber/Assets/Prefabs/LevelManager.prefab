@@ -440,7 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af0cced2a8c3b34da7a17fca25a5c69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timer: 10
+  timer: -1
   nextScene: 
   startingWhite: {fileID: 8969282181592033529}
 --- !u!1 &2240345805074421225
