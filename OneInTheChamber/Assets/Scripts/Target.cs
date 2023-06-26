@@ -5,6 +5,7 @@ using UnityEngine;
 public class Target : MonoBehaviour
 {
     public TargetGuide tg;
+    public SpriteRenderer bgMaskSprite;
     private Renderer r;
     private Animator animator;
 
@@ -12,6 +13,7 @@ public class Target : MonoBehaviour
     {
         tg = Instantiate(tg, Camera.main.transform.position, Quaternion.identity);
         tg.Init(gameObject);
+        bgMaskSprite.enabled = false;
         r = GetComponent<Renderer>();
         if (r.isVisible)
             OnBecameInvisible();
@@ -39,6 +41,7 @@ public class Target : MonoBehaviour
     {
         AudioManager.instance.PlaySFX("Target Break");
         StartCoroutine(AudioManager.instance.SweepLPF(6000f, 10f, 0.15f));
+        bgMaskSprite.enabled = true;
         animator.Play("Shatter");
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(.583f);
