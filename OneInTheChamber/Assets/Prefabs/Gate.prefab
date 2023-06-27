@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af544cf90b14ce47b8e5c8351523c50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeUntilOpen: 0.5
+  timeUntilOpen: 0.2
   resetTime: 1
   forceVelocity: 8.3
   hitPauseDuration: 0.06

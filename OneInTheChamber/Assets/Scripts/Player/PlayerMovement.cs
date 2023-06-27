@@ -566,6 +566,7 @@ public class PlayerMovement : MonoBehaviour
                 float minY = 6f;
                 if (rbody.velocity.y + blastForce < minY)
                     newVelocity = new Vector2(rbody.velocity.x, minY);
+                longJump = false;
                 yBlastTimer = yBlastTime;
                 animator.SetBool("Grounded", false);
                 animator.SetBool("Down Blast", true);
@@ -602,8 +603,6 @@ public class PlayerMovement : MonoBehaviour
         {
             float y = rbody.velocity.y > trueMaxSpeed.y && blastDirection != Vector2.up ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
-
-            longJump = false;
 
             Vector3 blastPos = new Vector3(transform.position.x + blastDirection.x * .5f, transform.position.y + blastDirection.y * .5f, 0);
             Instantiate(blast, blastPos, Quaternion.identity);
