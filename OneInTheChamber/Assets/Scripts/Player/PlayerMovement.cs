@@ -632,11 +632,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void AimCancel()
     {
+        aimEffectAnimator.SetBool("AimCancel", true);
         bulletTimeTimer = -1;
         aiming = false;
         canShoot = false;
         animator.SetBool("Aiming", false);
-        aimEffectAnimator.SetBool("AimCancel", true);
+        
 
         spriteTransform.rotation = Quaternion.identity;
 
@@ -656,13 +657,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void Shoot()
     {
-        canShoot = false;
         aiming = false;
+        canShoot = false;
         animator.SetBool("Aiming", false);
 
-        spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
-
         Vector2 laserDirection = getVectorFromPlayerToMouse();
+        if (laserDirection.x < 0)
+            spriteTransform.localScale = new Vector3(1, -1, 1);
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, laserDirection, 1000, target);
         if (hit.collider != null && hit.collider.gameObject.tag == "Target")
