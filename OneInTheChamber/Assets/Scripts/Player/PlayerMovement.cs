@@ -648,7 +648,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void SetLaserDirection(Vector2 aimDirection)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, 20f, LayerMask.GetMask("Ground"));
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, 100f, LayerMask.GetMask("Ground"));
         laserGuide.positionCount = 2;
         laserGuide.SetPosition(0, transform.position);
         laserGuide.SetPosition(1, hit.point);
