@@ -566,6 +566,7 @@ public class PlayerMovement : MonoBehaviour
                 float minY = 6f;
                 if (rbody.velocity.y + blastForce < minY)
                     newVelocity = new Vector2(rbody.velocity.x, minY);
+                longJump = false;
                 yBlastTimer = yBlastTime;
                 animator.SetBool("Grounded", false);
                 animator.SetBool("Down Blast", true);
@@ -603,8 +604,6 @@ public class PlayerMovement : MonoBehaviour
             float y = rbody.velocity.y > trueMaxSpeed.y && blastDirection != Vector2.up ? rbody.velocity.y : Mathf.Clamp(newVelocity.y, -trueMaxSpeed.y, trueMaxSpeed.y);
             rbody.velocity = new Vector2(Mathf.Clamp(newVelocity.x, -trueMaxSpeed.x, trueMaxSpeed.x), y);
 
-            longJump = false;
-
             Vector3 blastPos = new Vector3(transform.position.x + blastDirection.x * .5f, transform.position.y + blastDirection.y * .5f, 0);
             Instantiate(blast, blastPos, Quaternion.identity);
 
@@ -633,11 +632,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void AimCancel()
     {
+        aimEffectAnimator.SetBool("AimCancel", true);
         bulletTimeTimer = -1;
         aiming = false;
         canShoot = false;
         animator.SetBool("Aiming", false);
-        aimEffectAnimator.SetBool("AimCancel", true);
+        
 
         spriteTransform.rotation = Quaternion.identity;
 
@@ -649,7 +649,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void SetLaserDirection(Vector2 aimDirection)
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, 20f, LayerMask.GetMask("Ground"));
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, aimDirection, 100f, LayerMask.GetMask("Ground"));
         laserGuide.positionCount = 2;
         laserGuide.SetPosition(0, transform.position);
         laserGuide.SetPosition(1, hit.point);
@@ -657,13 +657,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void Shoot()
     {
-        canShoot = false;
         aiming = false;
+        canShoot = false;
         animator.SetBool("Aiming", false);
 
-        spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, Vector2.right) * Quaternion.Euler(0, 0, 90);
-
         Vector2 laserDirection = getVectorFromPlayerToMouse();
+        if (laserDirection.x < 0)
+            spriteTransform.localScale = new Vector3(1, -1, 1);
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position, laserDirection, 1000, target);
         if (hit.collider != null && hit.collider.gameObject.tag == "Target")

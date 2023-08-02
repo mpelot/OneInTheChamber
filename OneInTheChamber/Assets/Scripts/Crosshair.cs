@@ -32,7 +32,7 @@ public class Crosshair : MonoBehaviour
         {
             aiming = false;
         }
-        if (!aiming)
+        if (!aiming && playerTransform != null)
         {
             Vector2 dir = playerTransform.position - transform.position;
             dir = Mathf.Abs(dir.x) > Mathf.Abs(dir.y) ? Vector2.right * Mathf.Sign(dir.x) : Vector2.up * Mathf.Sign(dir.y);
