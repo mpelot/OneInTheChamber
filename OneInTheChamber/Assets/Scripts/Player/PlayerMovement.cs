@@ -55,6 +55,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform spriteTransform;
     [SerializeField] private Animator ssAnimator;
     [SerializeField] private Animator aimEffectAnimator;
+    [SerializeField] private SpriteRenderer tint;
+
 
     private bool facingRight = true;
     private bool coyoteTime = false;
@@ -220,10 +222,13 @@ public class PlayerMovement : MonoBehaviour
                 Vector2 laserDirection = getVectorFromPlayerToMouse();
                 animator.SetFloat("Cosine", Mathf.Cos(Vector2.Angle(Vector2.right, laserDirection) * Mathf.Deg2Rad));
                 spriteTransform.rotation = Quaternion.LookRotation(Vector3.forward, laserDirection) * Quaternion.Euler(0, 0, 90);
-                SetLaserDirection(laserDirection);
-                laserGuide.enabled = true;
+                //tint.color = new Color(tint.color.r, tint.color.g, tint.color.b, Mathf.Clamp(tint.color.a + Time.unscaledDeltaTime, 0f, .2f));
+                //SetLaserDirection(laserDirection);
+                //laserGuide.enabled = true;
             }
-        }
+        } 
+       /* else if (tint.color.a > 0)
+            tint.color = new Color(tint.color.r, tint.color.g, tint.color.b, Mathf.Clamp(tint.color.a - Time.unscaledDeltaTime, 0f, .2f));*/
     }
 
     void FixedUpdate()
@@ -637,7 +642,6 @@ public class PlayerMovement : MonoBehaviour
         aiming = false;
         canShoot = false;
         animator.SetBool("Aiming", false);
-        
 
         spriteTransform.rotation = Quaternion.identity;
 
@@ -665,16 +669,18 @@ public class PlayerMovement : MonoBehaviour
         if (laserDirection.x < 0)
             spriteTransform.localScale = new Vector3(1, -1, 1);
 
+        SetLaserDirection(laserDirection);
+        laserGuide.enabled = true;
+
         RaycastHit2D hit = Physics2D.Raycast(transform.position, laserDirection, 1000, target);
         if (hit.collider != null && hit.collider.gameObject.tag == "Target")
         {
             hit.collider.gameObject.GetComponent<Target>().Shatter();
-            Destroy(gameObject);
         } 
         else
         {
             FindObjectOfType<LevelManager>().Lose();
-            laserGuide.enabled = false;
+            //laserGuide.enabled = false;
             bulletTimeTimer = 0;
             Time.timeScale = 1;
             Time.fixedDeltaTime = .02f;  // The default
