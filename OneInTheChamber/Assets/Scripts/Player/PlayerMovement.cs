@@ -56,6 +56,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Animator ssAnimator;
     [SerializeField] private Animator aimEffectAnimator;
     [SerializeField] private SpriteRenderer tint;
+    [SerializeField] private LineRenderer laserGuide;
 
 
     private bool facingRight = true;
@@ -80,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 goalSpeed;
     [HideInInspector] public Vector2 platformVelocity;
     private Rigidbody2D rbody;
-    private LineRenderer laserGuide;
+    //private LineRenderer laserGuide;
     private Animator animator;
     private BoxCollider2D playerCollider;
     private Camera mainCam;
@@ -91,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        laserGuide = GetComponent<LineRenderer>();
+        //laserGuide = GetComponent<LineRenderer>();
         playerCollider = GetComponent<BoxCollider2D>();
         grappleJoint = GetComponent<SpringJoint2D>();
         accelValue = acceleration;
