@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float acceleration;
     [SerializeField] private float maxRunSpeedX;
     [SerializeField] private Vector2 trueMaxSpeed;
-    [SerializeField] private enum State {AIR, GROUND, WALL, GRAPPLE};
+    [SerializeField] private enum State {AIR, GROUND, WALL};
     [SerializeField] private State currentState = State.AIR;
 
     //Jumping
@@ -85,8 +85,6 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
     private BoxCollider2D playerCollider;
     private Camera mainCam;
-    private GameObject attachedGrapplePoint;
-    private SpringJoint2D grappleJoint;
 
     void Start()
     {
@@ -94,11 +92,9 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         //laserGuide = GetComponent<LineRenderer>();
         playerCollider = GetComponent<BoxCollider2D>();
-        grappleJoint = GetComponent<SpringJoint2D>();
         accelValue = acceleration;
         mainCam = Camera.main;
         fastFallModifier = 1;
-        attachedGrapplePoint = null;
         currentState = State.AIR;
     }
 
@@ -191,16 +187,6 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && canBlast && blastCoolDownTimer <= 0)
         {
             Blast();
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            if (currentState == State.GRAPPLE)
-            {
-                grappleJoint.enabled = false;
-                currentState = State.AIR;
-                attachedGrapplePoint = null;
-            }
         }
 
         // Shooting
@@ -702,14 +688,5 @@ public class PlayerMovement : MonoBehaviour
         norm.z = 0;
 
         return (norm - transform.position).normalized;
-    }
-
-    public void Grapple(GrapplePoint grapplePoint)
-    {
-        canBlast = false;
-        grappleJoint.enabled = true;
-        grappleJoint.connectedAnchor = grapplePoint.transform.position;
-        grappleJoint.distance = Vector2.Distance(transform.position, grapplePoint.transform.position) * 0.5f;
-        currentState = State.GRAPPLE;
     }
 }
