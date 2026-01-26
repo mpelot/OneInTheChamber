@@ -546,13 +546,13 @@ public class PlayerMovement : MonoBehaviour
     private void Slide()
     {
         sliding = true;
-        spriteTransform.localScale = new Vector3(spriteTransform.localScale.x, 0.5f, spriteTransform.localScale.z);
+        animator.SetBool("Sliding", true);
     }
 
     private void StopSlide()
     {
         sliding = false;
-        spriteTransform.localScale = new Vector3(spriteTransform.localScale.x, 1f, spriteTransform.localScale.z);
+        animator.SetBool("Sliding", false);
     }
 
     public void Bounce(float strength)
