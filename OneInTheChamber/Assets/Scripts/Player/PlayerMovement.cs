@@ -80,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
     private float fastFallModifier;
     private float lastSpeedX;
     [HideInInspector] public Vector2 lastSpeed;
-    private Vector2 goalSpeed;
+    private float goalSpeed;
     [HideInInspector] public Vector2 platformVelocity;
     private Rigidbody2D rbody;
     //private LineRenderer laserGuide;
@@ -119,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("Vertical Velocity", Mathf.Clamp(rbody.velocity.y - platformVelocity.y, -5, 5));
 
         // If Turning
-        if (((goalSpeed.x < 0 && facingRight) || (goalSpeed.x > 0 && !facingRight)) && currentState != State.WALL)
+        if (((goalSpeed < 0 && facingRight) || (goalSpeed > 0 && !facingRight)) && currentState != State.WALL && !sliding)
         {
             Turn();
         }
@@ -128,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Moving Backwards", transform.localScale.x * rbody.velocity.x < 0);
         
         // Calulate if the player is holding in the direction they are facing with input buffering
-        if ((facingRight && goalSpeed.x > 0) || (!facingRight && goalSpeed.x < 0))
+        if ((facingRight && goalSpeed > 0) || (!facingRight && goalSpeed < 0))
         {
             holdingForward = true;
             holdingForwardBufferTimer = holdingForwardBufferLength;
@@ -155,11 +155,11 @@ public class PlayerMovement : MonoBehaviour
             }
 
             // Enable Fast Falling
-            if (Input.GetKey(KeyCode.S))
-            {
-                fastFallModifier = 1.2f;
-                longJump = false;
-            }
+            //if (Input.GetKey(KeyCode.S))
+            //{
+            //    fastFallModifier = 1.2f;
+            //    longJump = false;
+            //}
 
             // Disable Long Jump
             if (Input.GetKeyUp(KeyCode.Space) || rbody.velocity.y <= 0)
@@ -175,14 +175,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
-            if (Input.GetKeyDown(KeyCode.S))
+            if (!sliding && Input.GetKeyDown(KeyCode.S))
             {
-                if (!sliding)
-                {
-                    Slide();
-                }
+                Slide();
             }
-            else
+            if (sliding && Input.GetKeyUp(KeyCode.S))
             {
                 StopSlide();
             }
@@ -323,6 +320,11 @@ public class PlayerMovement : MonoBehaviour
                 ssAnimator.SetBool("Land", true);
                 landDust.Play();
                 AudioManager.instance.PlaySFX("Land");
+
+                if (Input.GetKey(KeyCode.S))
+                {
+                    Slide();
+                }
             }
             //WallCling Transition
             else if(isOnWall() && holdingForward && Mathf.Abs(rbody.velocity.x) < 0.1f)
@@ -363,10 +365,10 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (sliding)
             {
-                accelValue = 0.5f * acceleration;
+                accelValue = 0.3f * acceleration;
             }
             // If Decelerating
-            else if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
+            else if (goalSpeed < rbody.velocity.x || Mathf.Sign(goalSpeed) != Mathf.Sign(rbody.velocity.x))
             {
                 accelValue = 1.75f * acceleration;
             }
@@ -383,6 +385,10 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded() == false)
             {
                 currentState = State.AIR;
+                if (sliding)
+                {
+                    StopSlide();
+                }
                 sliding = false;
                 coyoteTimer = coyoteTimeLength;
                 blastCoolDownTimer = 0;
@@ -440,14 +446,21 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Horizontal Speed for air and ground
-        goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeedX, rbody.velocity.y);
+        if (sliding)
+        {
+            goalSpeed = 0f;
+        } else
+        {
+            goalSpeed = Input.GetAxisRaw("Horizontal") * currentMaxSpeedX;
+        }
+
         if (currentState != State.WALL)
         {
-            rbody.velocity = Vector2.MoveTowards(rbody.velocity - platformVelocity, goalSpeed, accelValue * Time.fixedDeltaTime) + platformVelocity;
+            rbody.velocity = Vector2.MoveTowards(rbody.velocity - platformVelocity, new Vector2(goalSpeed, rbody.velocity.y), accelValue * Time.fixedDeltaTime) + platformVelocity;
         }
 
         // Update animation parameter
-        animator.SetFloat("Horizontal Input", Mathf.Abs(goalSpeed.x));
+        animator.SetFloat("Horizontal Input", Mathf.Abs(goalSpeed));
 
         // Decrements all of the timers
         if (coyoteTimer > 0)
@@ -532,13 +545,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void Slide()
     {
-        rbody.velocity = new Vector2(maxRunSpeedX * transform.localScale.x, rbody.velocity.y);
         sliding = true;
+        spriteTransform.localScale = new Vector3(spriteTransform.localScale.x, 0.5f, spriteTransform.localScale.z);
     }
 
     private void StopSlide()
     {
         sliding = false;
+        spriteTransform.localScale = new Vector3(spriteTransform.localScale.x, 1f, spriteTransform.localScale.z);
     }
 
     public void Bounce(float strength)
