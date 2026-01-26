@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -62,6 +63,7 @@ public class PlayerMovement : MonoBehaviour
     private bool facingRight = true;
     private bool coyoteTime = false;
     private bool holdingForward = false;
+    private bool sliding = false;
     private bool longJump = false;
     private bool aiming = false;
     private float coyoteTimer;
@@ -173,6 +175,17 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                if (!sliding)
+                {
+                    Slide();
+                }
+            }
+            else
+            {
+                StopSlide();
+            }
         }
         // ON WALL
         else if (currentState == State.WALL)
@@ -225,7 +238,7 @@ public class PlayerMovement : MonoBehaviour
         ssAnimator.SetBool("Land", false);
         ssAnimator.SetBool("WallSplat", false);
         ssAnimator.SetBool("Neutral", false);
-        // Player States
+        // === PLAYER STATES ===
         // IN AIR
         if (currentState == State.AIR)
         {
@@ -340,6 +353,7 @@ public class PlayerMovement : MonoBehaviour
                 lastSpeedX = rbody.velocity.x;
             }
         }
+
         // ON GROUND
         else if (currentState == State.GROUND)
         {
@@ -347,8 +361,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 Jump();
             }
+            else if (sliding)
+            {
+                accelValue = 0.5f * acceleration;
+            }
             // If Decelerating
-            if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
+            else if (goalSpeed.magnitude < rbody.velocity.magnitude || Mathf.Sign(goalSpeed.x) != Mathf.Sign(rbody.velocity.x))
             {
                 accelValue = 1.75f * acceleration;
             }
@@ -365,6 +383,7 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded() == false)
             {
                 currentState = State.AIR;
+                sliding = false;
                 coyoteTimer = coyoteTimeLength;
                 blastCoolDownTimer = 0;
                 animator.SetBool("Grounded", false);
@@ -372,6 +391,7 @@ public class PlayerMovement : MonoBehaviour
             }
             //Cannot Transition To WallCling
         }
+
         // WALL CLING
         else if (currentState == State.WALL)
         {
@@ -423,7 +443,7 @@ public class PlayerMovement : MonoBehaviour
         goalSpeed = new Vector2(Input.GetAxisRaw("Horizontal") * currentMaxSpeedX, rbody.velocity.y);
         if (currentState != State.WALL)
         {
-            rbody.velocity = Vector2.MoveTowards(rbody.velocity-platformVelocity, goalSpeed, accelValue * Time.fixedDeltaTime) + platformVelocity;
+            rbody.velocity = Vector2.MoveTowards(rbody.velocity - platformVelocity, goalSpeed, accelValue * Time.fixedDeltaTime) + platformVelocity;
         }
 
         // Update animation parameter
@@ -508,6 +528,17 @@ public class PlayerMovement : MonoBehaviour
         Turn();
         
         AudioManager.instance.PlaySFX("Jump");
+    }
+
+    private void Slide()
+    {
+        rbody.velocity = new Vector2(maxRunSpeedX * transform.localScale.x, rbody.velocity.y);
+        sliding = true;
+    }
+
+    private void StopSlide()
+    {
+        sliding = false;
     }
 
     public void Bounce(float strength)
